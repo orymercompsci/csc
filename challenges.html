@@ -11,8 +11,8 @@
         pre { white-space: pre-wrap; word-wrap: break-word; }
         .help-code-example { font-family: 'Courier New', Courier, monospace; }
 
-        /* FIXED: Comprehensive styles for rich text content */
-        .description-content {
+        /* FIXED: Made the primary color rule more specific to override defaults */
+        .bg-slate-800 .description-content {
             color: #d1d5db; /* Sets a light default color for all text */
         }
         .description-content ul, .description-content ol { 
@@ -31,7 +31,7 @@
         }
         .description-content p { 
             margin-bottom: 1rem; 
-            color: #d1d5db; /* Explicitly sets paragraph text color to fix black text issue */
+            /* No longer needs its own color rule, it will inherit correctly */
         }
         .description-content strong { 
             font-weight: bold; 
@@ -425,3 +425,4 @@
     </script>
 </body>
 </html>
+
