@@ -164,16 +164,22 @@
 
             file.readline()
             #3B82F6
-            file = open("days.txt",'r')
-            dataRead = file.readline()
-            file.close()
-            print(dataRead)
+            # This example needs a real file system to work.
+            # In this IDE, it will show an error.
+            # file = open("days.txt",'r')
+            # dataRead = file.readline()
+            # file.close()
+            # print(dataRead)
+            print("File reading requires a local Python environment.")
 
             file.writelines()
             #3B82F6
-            file = open("days.txt",'w')
-            dataRead = file.writelines("This text will be written to a file.")
-            file.close()
+            # This example needs a real file system to work.
+            # In this IDE, it will show an error.
+            # file = open("days.txt",'w')
+            # dataRead = file.writelines("This text will be written to a file.")
+            # file.close()
+            print("File writing requires a local Python environment.")
 
             Procedures
             #6366F1
@@ -399,12 +405,14 @@
             }
         });
         
-        document.getElementById('close-ide-btn').addEventListener('click', () => ideModal.classList.add('hidden'));
-        document.getElementById('run-code-btn').addEventListener('click', () => runCode(codeEditor.value));
-        document.getElementById('help-btn').addEventListener('click', () => helpModal.classList.remove('hidden'));
-        document.getElementById('close-help-btn').addEventListener('click', () => helpModal.classList.add('hidden'));
-        
-        document.addEventListener('DOMContentLoaded', main);
+        // This is the fix: move these event listeners into the DOMContentLoaded event
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('close-ide-btn').addEventListener('click', () => ideModal.classList.add('hidden'));
+            document.getElementById('run-code-btn').addEventListener('click', () => runCode(codeEditor.value));
+            document.getElementById('help-btn').addEventListener('click', () => helpModal.classList.remove('hidden'));
+            document.getElementById('close-help-btn').addEventListener('click', () => helpModal.classList.add('hidden'));
+            main();
+        });
     </script>
 </body>
 </html>
