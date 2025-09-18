@@ -229,6 +229,19 @@
             print(total)
         `;
 
+        // FIXED: Added a function to escape HTML special characters
+        function escapeHTML(str) {
+            return str.replace(/[&<>"']/g, function(match) {
+                return {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#39;'
+                }[match];
+            });
+        }
+
         function parseCommandData(text) {
             const commandObject = {};
             const entries = text.trim().split(/\n\s*\n/);
@@ -331,7 +344,6 @@
                 }).join(', ');
 
                 const challengeElement = document.createElement('div');
-                // FIXED: Ensured the background is white for light mode
                 challengeElement.className = `bg-white rounded-lg shadow-lg overflow-hidden relative`;
                 challengeElement.id = `challenge-${challenge.id}`;
                 challengeElement.innerHTML = `
@@ -348,7 +360,6 @@
                         <div>
                             <h3 class="font-semibold text-lg text-gray-800 mb-2">Solution</h3>
                             <div class="solution-container" id="solution-${index}"><div class="password-gate flex items-center gap-2"><input type="password" placeholder="Enter password to view" class="bg-gray-200 border border-gray-400 text-sm rounded-lg p-2 w-full max-w-xs"><button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-sm">Show</button></div>
-                            <!-- FIXED: Changed solution code block to light theme -->
                             <pre class="solution-code bg-gray-200 text-gray-800 rounded-md p-4 font-mono text-sm hidden mt-2"></pre></div>
                         </div>
                     </div>`;
@@ -399,10 +410,11 @@
             const closeHelpBtn = document.getElementById('close-help-btn');
             const helpContent = document.getElementById('help-content');
             
+            // FIXED: Used the escapeHTML function to correctly render code examples
             helpContent.innerHTML = Object.values(COMMAND_DATA).map(cmd => `
                 <div>
                     <h3 class="text-lg font-bold" style="color:${cmd.color};">${cmd.name}</h3>
-                    <pre class="bg-gray-200 text-gray-800 rounded-md p-4 font-mono text-sm mt-2 help-code-example">${cmd.example.trim()}</pre>
+                    <pre class="bg-gray-200 text-gray-800 rounded-md p-4 font-mono text-sm mt-2 help-code-example">${escapeHTML(cmd.example.trim())}</pre>
                 </div>
             `).join('');
 
