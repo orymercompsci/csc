@@ -6,12 +6,10 @@
     <title>Challenges</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/skulpt.min.js" type="text/javascript"></script>
-    <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/skulpt-stdlib.js" type="text/javascript"></script>
     <style>
         body { font-family: 'Poppins', sans-serif; transition: background-color 0.5s ease; }
         pre { white-space: pre-wrap; word-wrap: break-word; }
-        #code-editor, .help-code-example { font-family: 'Courier New', Courier, monospace; }
+        .help-code-example { font-family: 'Courier New', Courier, monospace; }
     </style>
 </head>
 <body class="bg-slate-900 text-gray-200 min-h-screen">
@@ -41,20 +39,6 @@
         </div>
     </div>
 
-    <!-- IDE Modal -->
-    <div id="ide-modal" class="fixed inset-0 bg-slate-900 bg-opacity-95 flex items-center justify-center z-50 hidden">
-        <div class="bg-slate-800 p-6 rounded-lg shadow-xl w-full max-w-2xl relative">
-            <button id="close-ide-btn" class="absolute top-4 right-4 text-slate-400 hover:text-white">
-                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-            </button>
-            <h2 class="text-xl font-bold text-white mb-4">Python IDE</h2>
-            <textarea id="code-editor" class="w-full h-64 bg-slate-900 rounded-md font-mono text-sm p-3 text-white border border-slate-600 focus:ring-blue-500 focus:border-blue-500" spellcheck="false"></textarea>
-            <button id="run-code-btn" class="mt-4 text-white bg-green-600 hover:bg-green-700 font-medium rounded-lg text-sm px-5 py-2.5">Run Code</button>
-            <h3 class="font-semibold text-lg text-white mt-4 mb-2">Output:</h3>
-            <pre id="output-area" class="bg-slate-900 rounded-md p-4 font-mono text-sm text-gray-300 h-32 overflow-y-auto border border-slate-700"></pre>
-        </div>
-    </div>
-
     <!-- Delete Confirmation Modal -->
     <div id="delete-modal" class="fixed inset-0 bg-slate-900 bg-opacity-95 flex items-center justify-center z-50 hidden"><div class="bg-slate-800 p-8 rounded-lg shadow-xl text-center w-full max-w-sm"><h2 class="text-2xl font-bold text-white mb-4">Confirm Deletion</h2><p class="text-slate-400 mb-6">Enter the admin password to permanently delete this challenge.</p><form id="delete-form" class="flex flex-col gap-4"><input type="password" id="delete-password-input" class="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg p-2.5 text-center" placeholder="Password" required><div class="flex gap-4"><button type="button" id="cancel-delete-btn" class="w-full text-white bg-slate-600 hover:bg-slate-700 font-medium rounded-lg text-sm px-5 py-2.5">Cancel</button><button type="submit" id="confirm-delete-btn" class="w-full text-white bg-red-600 hover:bg-red-700 font-medium rounded-lg text-sm px-5 py-2.5">Delete</button></div><p id="delete-error" class="text-red-400 text-sm mt-2 h-4"></p></form></div></div>
 
@@ -68,9 +52,6 @@
 
         let db;
         const challengesContainer = document.getElementById('challenges-container');
-        const ideModal = document.getElementById('ide-modal');
-        const codeEditor = document.getElementById('code-editor');
-        const outputArea = document.getElementById('output-area');
         const helpModal = document.getElementById('help-modal');
         
         const TOPIC_STYLES = { 'sequence': { name: 'Sequence', color: 'red' }, 'selection': { name: 'Selection', color: 'orange' }, 'iteration': { name: 'Iteration', color: 'yellow' }, 'data-structures': { name: 'Data Structures', color: 'green' }, 'file-handling': { name: 'File Handling', color: 'blue' }, 'subprograms': { name: 'Subprograms', color: 'indigo' }, 'exam-questions': { name: 'Exam Questions', color: 'purple' }, 'default': { name: 'Challenges', color: 'slate' } };
@@ -131,7 +112,7 @@
               print("The sea is blue")
 
             if/else
-            #F97316
+            #F9T316
             hour = int(input("Enter the hour (24 hour clock) :"))
             if hour < 18:
               print("Good day")
@@ -164,8 +145,6 @@
 
             file.readline()
             #3B82F6
-            # This example needs a real file system to work.
-            # In this IDE, it will show an error.
             # file = open("days.txt",'r')
             # dataRead = file.readline()
             # file.close()
@@ -174,8 +153,6 @@
 
             file.writelines()
             #3B82F6
-            # This example needs a real file system to work.
-            # In this IDE, it will show an error.
             # file = open("days.txt",'w')
             # dataRead = file.writelines("This text will be written to a file.")
             # file.close()
@@ -211,7 +188,7 @@
                 const name = lines[0].trim();
                 const color = lines[1].trim();
                 const example = lines.slice(2).join('\n');
-                const key = name.replace(/\(\)/g, '').toLowerCase(); // Normalize key
+                const key = name.replace(/\(\)/g, '').toLowerCase();
                 commandObject[key] = { name, color, example };
             });
             return commandObject;
@@ -264,8 +241,8 @@
                 const commandsHTML = commands.map(cmd => {
                     const commandKey = cmd.replace(/\(\)/g, '');
                     const commandInfo = COMMAND_DATA[commandKey];
-                    const colorStyle = commandInfo ? `color: ${commandInfo.color}` : 'color: #94a3b8'; // slate-400
-                    return `<span class="command-tag cursor-pointer font-mono font-semibold hover:underline" style="${colorStyle}" data-command="${commandKey}">${cmd}</span>`;
+                    const colorStyle = commandInfo ? `color: ${commandInfo.color}` : 'color: #94a3b8';
+                    return `<span class="font-mono font-semibold" style="${colorStyle}">${cmd}</span>`;
                 }).join(', ');
 
                 const challengeElement = document.createElement('div');
@@ -298,7 +275,6 @@
                     <div>
                         <h3 class="font-bold text-lg" style="color: ${command.color};">${command.name}</h3>
                         <pre class="bg-slate-900 rounded-md p-4 mt-2 text-sm text-gray-300 help-code-example">${command.example}</pre>
-                        <button class="try-code-btn mt-2 text-white bg-blue-600 hover:bg-blue-700 font-medium rounded-lg text-xs px-3 py-1.5" data-command-key="${key}">Try this code</button>
                     </div>
                 `;
                 helpContent.appendChild(helpEntry);
@@ -317,22 +293,6 @@
                 console.error("Error fetching challenges:", error);
                 challengesContainer.innerHTML = `<p class="text-center text-red-400">Could not load challenges. Check browser console for index link.</p>`;
             }
-        }
-
-        function runCode(code) {
-            outputArea.textContent = ''; 
-            Sk.pre = "output-area";
-            Sk.configure({
-                output: (text) => { outputArea.textContent += text; },
-                read: (x) => {
-                    if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined) throw new Error("File not found: '" + x + "'");
-                    return Sk.builtinFiles["files"][x];
-                },
-                inputfun: (prompt) => { return window.prompt(prompt); },
-                inputfunTakesPrompt: true
-            });
-            const promise = Sk.misceval.asyncToPromise(() => Sk.importMainWithBody("<stdin>", false, code, true));
-            promise.then(res => {}, err => { outputArea.textContent += err.toString(); });
         }
 
         async function main() {
@@ -380,35 +340,9 @@
                     passwordInput.placeholder = 'Incorrect password!';
                 }
             }
-            
-            const commandTag = e.target.closest('.command-tag');
-            if (commandTag) {
-                const command = commandTag.dataset.command;
-                const commandInfo = COMMAND_DATA[command];
-                if (commandInfo && commandInfo.example) {
-                    codeEditor.value = commandInfo.example;
-                    outputArea.textContent = '';
-                    ideModal.classList.remove('hidden');
-                }
-            }
-
-            const tryCodeBtn = e.target.closest('.try-code-btn');
-            if (tryCodeBtn) {
-                const commandKey = tryCodeBtn.dataset.commandKey;
-                const commandInfo = COMMAND_DATA[commandKey];
-                if (commandInfo && commandInfo.example) {
-                    codeEditor.value = commandInfo.example;
-                    outputArea.textContent = '';
-                    helpModal.classList.add('hidden');
-                    ideModal.classList.remove('hidden');
-                }
-            }
         });
         
-        // This is the fix: move these event listeners into the DOMContentLoaded event
         document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('close-ide-btn').addEventListener('click', () => ideModal.classList.add('hidden'));
-            document.getElementById('run-code-btn').addEventListener('click', () => runCode(codeEditor.value));
             document.getElementById('help-btn').addEventListener('click', () => helpModal.classList.remove('hidden'));
             document.getElementById('close-help-btn').addEventListener('click', () => helpModal.classList.add('hidden'));
             main();
