@@ -8,13 +8,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Poppins', sans-serif; }
-        .spinner {
-            border-top-color: #3498db;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
     </style>
 </head>
 <body class="bg-slate-900 text-gray-200 min-h-screen py-12">
@@ -36,20 +29,7 @@
         <div class="bg-slate-800 rounded-lg shadow-xl p-8">
             <div class="text-center mb-8">
                 <h1 class="text-3xl font-bold text-white">Add a New Challenge</h1>
-                <p class="text-slate-400">Fill out the form below or use the AI generator to create a new programming challenge.</p>
-            </div>
-
-            <!-- AI Generator Section -->
-            <div class="bg-slate-700/50 border border-slate-600 p-6 rounded-lg mb-8">
-                <h2 class="text-xl font-bold text-white mb-4">✨ AI Challenge Generator</h2>
-                 <div class="flex flex-col sm:flex-row gap-4">
-                    <input type="text" id="ai-prompt" class="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg block w-full p-2.5" placeholder="e.g., 'A function to check for a prime number'">
-                    <button id="ai-generate-btn" class="text-white bg-purple-600 hover:bg-purple-700 font-medium rounded-lg text-sm px-5 py-2.5 flex items-center justify-center w-full sm:w-auto">
-                        <span id="ai-btn-text">Generate Challenge</span>
-                        <div id="ai-spinner" class="spinner w-4 h-4 rounded-full border-2 border-t-purple-200 border-r-purple-200 border-b-purple-200 hidden ml-2"></div>
-                    </button>
-                </div>
-                 <p id="ai-error" class="text-red-400 text-sm mt-2 h-4"></p>
+                <p class="text-slate-400">Fill out the form below to create a new programming challenge.</p>
             </div>
 
             <form id="add-challenge-form" class="space-y-6">
@@ -115,75 +95,6 @@
         const passwordOverlay = document.getElementById('password-overlay');
         const mainContent = document.getElementById('main-content');
         
-        async function callGeminiAPI(prompt, isJson = false) {
-            const apiKey = ""; 
-            const model = 'gemini-2.5-flash-preview-05-20';
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-            const payload = { contents: [{ parts: [{ text: prompt }] }] };
-            if (isJson) {
-                payload.generationConfig = {
-                    responseMimeType: "application/json",
-                    responseSchema: {
-                        type: "OBJECT",
-                        properties: {
-                            "title": { "type": "STRING" },
-                            "description": { "type": "STRING" },
-                            "screenOutput": { "type": "STRING" },
-                            "solution": { "type": "STRING" }
-                        }
-                    }
-                };
-            }
-            try {
-                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                const result = await response.json();
-                return result.candidates?.[0]?.content?.parts?.[0]?.text;
-            } catch (error) {
-                console.error("Gemini API call failed:", error);
-                return null;
-            }
-        }
-        
-        document.getElementById('ai-generate-btn').addEventListener('click', async () => {
-            const promptInput = document.getElementById('ai-prompt');
-            const aiError = document.getElementById('ai-error');
-            const btnText = document.getElementById('ai-btn-text');
-            const spinner = document.getElementById('ai-spinner');
-            
-            if (!promptInput.value.trim()) {
-                aiError.textContent = "Please enter a prompt for the AI.";
-                return;
-            }
-            aiError.textContent = '';
-            btnText.textContent = 'Generating...';
-            spinner.classList.remove('hidden');
-            promptInput.disabled = true;
-            document.getElementById('ai-generate-btn').disabled = true;
-
-            const fullPrompt = `Generate a complete Python programming challenge based on the following idea: "${promptInput.value}". The target audience is beginner programmers. Provide a clear title, a detailed description, a simple example of the expected screen output, and a complete Python solution. The response must be a valid JSON object with the keys: "title", "description", "screenOutput", and "solution".`;
-            const resultText = await callGeminiAPI(fullPrompt, true);
-
-            if (resultText) {
-                try {
-                    const resultJson = JSON.parse(resultText);
-                    document.getElementById('challenge-title').value = resultJson.title || '';
-                    document.getElementById('challenge-description').value = resultJson.description || '';
-                    document.getElementById('screen-output').value = resultJson.screenOutput || '';
-                    document.getElementById('solution').value = resultJson.solution || '';
-                } catch (e) {
-                    aiError.textContent = "AI returned invalid data. Please try again.";
-                }
-            } else {
-                aiError.textContent = "Failed to generate challenge. Check console for details.";
-            }
-
-            btnText.textContent = 'Generate Challenge';
-            spinner.classList.add('hidden');
-            promptInput.disabled = false;
-            document.getElementById('ai-generate-btn').disabled = false;
-        });
-
         document.getElementById('password-form').addEventListener('submit', (e) => {
             e.preventDefault();
             if (document.getElementById('password-input').value === 'Nintendo1') {
