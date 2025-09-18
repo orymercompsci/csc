@@ -72,7 +72,7 @@
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"; 
         import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
         
-        let db, auth, isPasswordCorrect = false, quill; 
+        let db, auth, isPasswordCorrect = false, quill, isSubmitting = false; 
         const form = document.getElementById("add-challenge-form");
         const submitBtn = document.getElementById("submit-btn");
         const statusMessage = document.getElementById("status-message");
@@ -306,10 +306,13 @@
 
         form.addEventListener("submit", async e => { 
             e.preventDefault();
+            if (isSubmitting) return; // Prevent double submissions
             if (!db || !auth.currentUser) {
                 updateStatus("Database not ready. Try again.", "error");
                 return;
             }
+            
+            isSubmitting = true;
             submitBtn.disabled = true;
             submitBtn.textContent = "Adding...";
             
@@ -328,7 +331,6 @@
             });
             const commandsUsedString = selectedCommands.join(', ');
             
-            // Ensure the description is taken from the hidden textarea, which is updated by Quill
             const descriptionHTML = document.getElementById('challenge-description').value;
 
             const challengeData = { 
@@ -354,6 +356,7 @@
                 console.error("Error adding document: ", error);
                 updateStatus("Failed to add challenge.", "error");
             } finally {
+                isSubmitting = false;
                 submitBtn.disabled = false;
                 submitBtn.textContent = "Add Challenge";
             }
