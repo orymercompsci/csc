@@ -7,132 +7,56 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            transition: background-color 0.5s ease;
-        }
-        pre {
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
-        .modal-container {
-            max-height: 80vh;
-        }
+        body { font-family: 'Poppins', sans-serif; transition: background-color 0.5s ease; }
+        pre { white-space: pre-wrap; word-wrap: break-word; }
+        .spinner { border-top-color: #3498db; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="bg-slate-900 text-gray-200 min-h-screen">
-
     <div class="w-full max-w-5xl mx-auto p-4 py-12">
         <header id="page-header" class="relative text-center mb-12 transition-all duration-500 border-b-4 pb-4 rounded-lg">
             <h1 id="topic-title" class="text-4xl md:text-5xl font-bold text-white">Loading Challenges...</h1>
             <a href="index.html" class="text-sm text-slate-400 hover:text-white transition mt-4 inline-block">&larr; Back to Home</a>
-            <button id="help-btn" class="absolute top-0 right-0 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 inline-block -mt-1 mr-1"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                Help
-            </button>
         </header>
-
         <main id="challenges-container" class="space-y-8">
-            <div id="loading-spinner" class="text-center">
-                 <p class="text-lg text-slate-400">Fetching challenges from the database...</p>
-            </div>
+            <div id="loading-spinner" class="text-center"><p class="text-lg text-slate-400">Fetching challenges from the database...</p></div>
         </main>
     </div>
 
-    <!-- Help Modal -->
-    <div id="help-modal" class="fixed inset-0 bg-slate-900 bg-opacity-95 flex items-center justify-center z-50 hidden">
-        <div class="bg-slate-800 p-8 rounded-lg shadow-xl w-full max-w-3xl modal-container relative">
-            <button id="close-help-btn" class="absolute top-4 right-4 text-slate-400 hover:text-white">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-            </button>
-            <h2 class="text-2xl font-bold text-white mb-6 text-center">Command Reference</h2>
-            <div class="overflow-y-auto pr-4 modal-container">
-                <table class="w-full text-sm text-left text-slate-300">
-                    <thead class="bg-slate-700 text-xs uppercase">
-                        <tr><th class="p-3">Concept</th><th class="p-3">Command</th><th class="p-3">Example</th></tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-700">
-                        <!-- Content will be dynamically inserted here from the PDF data -->
-                        <tr><td class="p-3 font-semibold">Input/Output</td><td class="p-3 font-mono">input(...)</td><td class="p-3 font-mono">myName = input("Enter name")</td></tr>
-                        <tr><td class="p-3 font-semibold"></td><td class="p-3 font-mono">print(...)</td><td class="p-3 font-mono">print("Hello")</td></tr>
-                        <tr><td class="p-3 font-semibold">Variables</td><td class="p-3 font-mono">variable = value</td><td class="p-3 font-mono">x = 3</td></tr>
-                        <tr><td class="p-3 font-semibold"></td><td class="p-3 font-mono">const</td><td class="p-3 font-mono">const vat = 0.2</td></tr>
-                        <tr><td class="p-3 font-semibold">Casting</td><td class="p-3 font-mono">str(), int(), float()</td><td class="p-3 font-mono">str(345), int("3"), float("4.52")</td></tr>
-                        <tr><td class="p-3 font-semibold">Selection</td><td class="p-3 font-mono">if/elif/else/endif</td><td class="p-3 font-mono">if x > 10 then ... else ... endif</td></tr>
-                        <tr><td class="p-3 font-semibold"></td><td class="p-3 font-mono">switch/case/default</td><td class="p-3 font-mono">switch day: case "Sat": ... default: ... endswitch</td></tr>
-                        <tr><td class="p-3 font-semibold">Iteration</td><td class="p-3 font-mono">for i = 0 to 9 ... next i</td><td class="p-3 font-mono">Loops 10 times.</td></tr>
-                        <tr><td class="p-3 font-semibold"></td><td class="p-3 font-mono">while ... endwhile</td><td class="p-3 font-mono">while answer != "Yes" ... endwhile</td></tr>
-                        <tr><td class="p-3 font-semibold"></td><td class="p-3 font-mono">do ... until</td><td class="p-3 font-mono">do ... until answer == "Yes"</td></tr>
-                        <tr><td class="p-3 font-semibold">String Handling</td><td class="p-3 font-mono">.length</td><td class="p-3 font-mono">"Computer".length  (returns 8)</td></tr>
-                        <tr><td class="p-3 font-semibold"></td><td class="p-3 font-mono">.substring(start, len)</td><td class="p-3 font-mono">"Computer".substring(3, 4) (returns "pute")</td></tr>
-                        <tr><td class="p-3 font-semibold"></td><td class="p-3 font-mono">.upper / .lower</td><td class="p-3 font-mono">"Hi".upper (returns "HI")</td></tr>
-                        <tr><td class="p-3 font-semibold">File Handling</td><td class="p-3 font-mono">myFile = open("x.txt")</td><td class="p-3 font-mono">Opens a file.</td></tr>
-                        <tr><td class="p-3 font-semibold"></td><td class="p-3 font-mono">myFile.readLine()</td><td class="p-3 font-mono">Reads the next line.</td></tr>
-                        <tr><td class="p-3 font-semibold"></td><td class="p-3 font-mono">myFile.writeLine("Hi")</td><td class="p-3 font-mono">Writes "Hi" to the file.</td></tr>
-                        <tr><td class="p-3 font-semibold"></td><td class="p-3 font-mono">myFile.close()</td><td class="p-3 font-mono">Closes the file.</td></tr>
-                        <tr><td class="p-3 font-semibold">Sub Programs</td><td class="p-3 font-mono">procedure name()...end</td><td class="p-3 font-mono">A block of code with no return value.</td></tr>
-                        <tr><td class="p-3 font-semibold"></td><td class="p-3 font-mono">function name()...return...end</td><td class="p-3 font-mono">A block of code that returns a value.</td></tr>
-                         <tr><td class="p-3 font-semibold">Arrays</td><td class="p-3 font-mono">array colours[5]</td><td class="p-3 font-mono">Creates an array with 5 elements.</td></tr>
-                        <tr><td class="p-3 font-semibold"></td><td class="p-3 font-mono">colours[0] = "Blue"</td><td class="p-3 font-mono">Assigns "Blue" to the first element.</td></tr>
-
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-
     <!-- Delete Confirmation Modal -->
-    <div id="delete-modal" class="fixed inset-0 bg-slate-900 bg-opacity-95 flex items-center justify-center z-50 hidden">
-        <div class="bg-slate-800 p-8 rounded-lg shadow-xl text-center w-full max-w-sm">
-            <h2 class="text-2xl font-bold text-white mb-4">Confirm Deletion</h2>
-            <p class="text-slate-400 mb-6">Enter the admin password to permanently delete this challenge.</p>
-            <form id="delete-form" class="flex flex-col gap-4">
-                <input type="password" id="delete-password-input" class="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg p-2.5 text-center" placeholder="Password" required>
-                <div class="flex gap-4">
-                    <button type="button" id="cancel-delete-btn" class="w-full text-white bg-slate-600 hover:bg-slate-700 font-medium rounded-lg text-sm px-5 py-2.5">Cancel</button>
-                    <button type="submit" id="confirm-delete-btn" class="w-full text-white bg-red-600 hover:bg-red-700 font-medium rounded-lg text-sm px-5 py-2.5">Delete</button>
-                </div>
-                <p id="delete-error" class="text-red-400 text-sm mt-2 h-4"></p>
-            </form>
-        </div>
-    </div>
+    <div id="delete-modal" class="fixed inset-0 bg-slate-900 bg-opacity-95 flex items-center justify-center z-50 hidden"><div class="bg-slate-800 p-8 rounded-lg shadow-xl text-center w-full max-w-sm"><h2 class="text-2xl font-bold text-white mb-4">Confirm Deletion</h2><p class="text-slate-400 mb-6">Enter the admin password to permanently delete this challenge.</p><form id="delete-form" class="flex flex-col gap-4"><input type="password" id="delete-password-input" class="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg p-2.5 text-center" placeholder="Password" required><div class="flex gap-4"><button type="button" id="cancel-delete-btn" class="w-full text-white bg-slate-600 hover:bg-slate-700 font-medium rounded-lg text-sm px-5 py-2.5">Cancel</button><button type="submit" id="confirm-delete-btn" class="w-full text-white bg-red-600 hover:bg-red-700 font-medium rounded-lg text-sm px-5 py-2.5">Delete</button></div><p id="delete-error" class="text-red-400 text-sm mt-2 h-4"></p></form></div></div>
 
     <script>
-      const firebaseConfig = {
-        apiKey: "AIzaSyDWfJRQhNUgktjIQaFVsoAqhsZtUQD3fpQ",
-        authDomain: "cs-challenges-website.firebaseapp.com",
-        projectId: "cs-challenges-website",
-        storageBucket: "cs-challenges-website.firebasestorage.app",
-        messagingSenderId: "1062820761218",
-        appId: "1:1062820761218:web:ab4382d3f981d3f586ee9b"
-      };
+      const firebaseConfig = { apiKey: "AIzaSyDWfJRQhNUgktjIQaFVsoAqhsZtUQD3fpQ", authDomain: "cs-challenges-website.firebaseapp.com", projectId: "cs-challenges-website", storageBucket: "cs-challenges-website.firebasestorage.app", messagingSenderId: "1062820761218", appId: "1:1062820761218:web:ab4382d3f981d3f586ee9b" };
     </script>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { getFirestore, collection, getDocs, query, where, orderBy, doc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         let db;
-        let challengeToDeleteId = null;
-        
-        const challengesContainer = document.getElementById('challenges-container');
-        const deleteModal = document.getElementById('delete-modal');
-        const deleteForm = document.getElementById('delete-form');
-        const deletePasswordInput = document.getElementById('delete-password-input');
-        const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
-        const deleteError = document.getElementById('delete-error');
-        const helpBtn = document.getElementById('help-btn');
-        const helpModal = document.getElementById('help-modal');
-        const closeHelpBtn = document.getElementById('close-help-btn');
+        let challengesCache = [];
 
-        const TOPIC_STYLES = {
-            'sequence': { name: 'Sequence', color: 'red' }, 'selection': { name: 'Selection', color: 'orange' },
-            'iteration': { name: 'Iteration', color: 'yellow' }, 'data-structures': { name: 'Data Structures', color: 'green' },
-            'file-handling': { name: 'File Handling', color: 'blue' }, 'subprograms': { name: 'Subprograms', color: 'indigo' },
-            'exam-questions': { name: 'Exam Questions', color: 'purple' }, 'default': { name: 'Challenges', color: 'slate' }
-        };
+        const challengesContainer = document.getElementById('challenges-container');
+        
+        const TOPIC_STYLES = { 'sequence': { name: 'Sequence', color: 'red' }, 'selection': { name: 'Selection', color: 'orange' }, 'iteration': { name: 'Iteration', color: 'yellow' }, 'data-structures': { name: 'Data Structures', color: 'green' }, 'file-handling': { name: 'File Handling', color: 'blue' }, 'subprograms': { name: 'Subprograms', color: 'indigo' }, 'exam-questions': { name: 'Exam Questions', color: 'purple' }, 'default': { name: 'Challenges', color: 'slate' } };
+
+        async function callGeminiAPI(prompt) {
+            const apiKey = "";
+            const model = 'gemini-2.5-flash-preview-05-20';
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+            const payload = { contents: [{ parts: [{ text: prompt }] }] };
+            try {
+                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const result = await response.json();
+                return result.candidates?.[0]?.content?.parts?.[0]?.text;
+            } catch (error) {
+                console.error("Gemini API call failed:", error);
+                return "Sorry, I couldn't get a response from the AI. Please try again later.";
+            }
+        }
 
         function getTopicFromURL() { return new URLSearchParams(window.location.search).get('topic') || 'default'; }
 
@@ -144,93 +68,55 @@
             document.body.classList.add(`bg-${style.color}-900`);
         }
         
-        function openDeleteModal(challengeId) {
-            challengeToDeleteId = challengeId;
-            deletePasswordInput.value = '';
-            deleteError.textContent = '';
-            deleteModal.classList.remove('hidden');
-            deletePasswordInput.focus();
-        }
-
-        function closeDeleteModal() {
-            deleteModal.classList.add('hidden');
-            challengeToDeleteId = null;
-        }
-
-        async function handleDeleteChallenge() {
-            if (!challengeToDeleteId || deletePasswordInput.value !== 'Nintendo1') {
-                deleteError.textContent = 'Incorrect password.';
-                return;
-            }
-            try {
-                await deleteDoc(doc(db, 'challenges', challengeToDeleteId));
-                document.getElementById(`challenge-${challengeToDeleteId}`).remove();
-                closeDeleteModal();
-            } catch (error) {
-                console.error("Error removing document: ", error);
-                deleteError.textContent = 'Failed to delete challenge.';
-            }
-        }
-        
         async function handleRankUpdate(challengeId, currentRank, change) {
             const newRank = Number(currentRank) + Number(change);
             try {
                 await updateDoc(doc(db, 'challenges', challengeId), { rank: newRank });
-                fetchAndRenderChallenges(); // Re-fetch and re-render to get the correct order
-            } catch (error) {
-                console.error("Error updating rank: ", error);
-                alert("Failed to update rank. See console for details.");
+                fetchAndRenderChallenges();
+            } catch (error) { console.error("Error updating rank: ", error); }
+        }
+
+        async function handleDeleteChallenge(challengeId) {
+            const password = document.getElementById('delete-password-input').value;
+            const deleteError = document.getElementById('delete-error');
+            if (password !== 'Nintendo1') {
+                deleteError.textContent = 'Incorrect password.';
+                return;
             }
+            try {
+                await deleteDoc(doc(db, 'challenges', challengeId));
+                document.getElementById(`challenge-${challengeId}`).remove();
+                document.getElementById('delete-modal').classList.add('hidden');
+            } catch (error) { deleteError.textContent = 'Failed to delete challenge.'; }
         }
 
         function renderChallenges(challenges) {
+            challengesCache = challenges; // Cache the challenges for AI features
             challengesContainer.innerHTML = ''; 
             if (challenges.length === 0) {
-                challengesContainer.innerHTML = `<p class="text-center text-slate-400">No challenges found for this topic yet.</p>`;
+                challengesContainer.innerHTML = `<p class="text-center text-slate-400">No challenges found.</p>`;
                 return;
             }
             challenges.forEach((challenge, index) => {
-                const testingTableRows = (challenge.testingTable || []).map(row => `
-                    <tr class="border-b border-slate-700"><td class="p-2">${row.test || ''}</td><td class="p-2">${row.input || ''}</td><td class="p-2">${row.output || ''}</td></tr>`).join('');
-                
+                const testingTableRows = (challenge.testingTable || []).map(row => `<tr class="border-b border-slate-700"><td class="p-2">${row.test || ''}</td><td class="p-2">${row.input || ''}</td><td class="p-2">${row.output || ''}</td></tr>`).join('');
                 const challengeElement = document.createElement('div');
                 challengeElement.className = `bg-slate-800 rounded-lg shadow-xl overflow-hidden relative`;
                 challengeElement.id = `challenge-${challenge.id}`;
                 challengeElement.innerHTML = `
-                    <div class="absolute top-4 right-4">
-                        <button class="delete-challenge-btn text-slate-400 hover:text-red-500 transition-colors" title="Delete Challenge" data-id="${challenge.id}">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-                        </button>
+                    <div class="absolute top-4 right-4 flex gap-2">
+                         <button class="delete-challenge-btn text-slate-400 hover:text-red-500 transition-colors" title="Delete Challenge" data-id="${challenge.id}"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
                     </div>
-                    <div class="absolute top-4 left-4 flex flex-col items-center">
-                        <button class="rank-btn" data-id="${challenge.id}" data-rank="${challenge.rank || 0}" data-change="1" title="Increase Rank">
-                            <svg class="w-6 h-6 text-slate-400 hover:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
-                        </button>
-                        <span class="font-bold text-lg text-white" title="Current Rank">${challenge.rank || 0}</span>
-                        <button class="rank-btn" data-id="${challenge.id}" data-rank="${challenge.rank || 0}" data-change="-1" title="Decrease Rank">
-                            <svg class="w-6 h-6 text-slate-400 hover:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                        </button>
-                    </div>
+                    <div class="absolute top-4 left-4 flex flex-col items-center"><button class="rank-btn" data-id="${challenge.id}" data-rank="${challenge.rank || 0}" data-change="1" title="Increase Rank"><svg class="w-6 h-6 text-slate-400 hover:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg></button><span class="font-bold text-lg text-white" title="Current Rank">${challenge.rank || 0}</span><button class="rank-btn" data-id="${challenge.id}" data-rank="${challenge.rank || 0}" data-change="-1" title="Decrease Rank"><svg class="w-6 h-6 text-slate-400 hover:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button></div>
                     <div class="p-6 pl-20 pr-12">
-                        <h2 class="text-2xl font-bold text-white mb-4">${challenge.title}</h2>
+                        <h2 class="text-2xl font-bold text-white mb-2">${challenge.title}</h2>
+                        <div class="mb-4"><button class="get-hint-btn text-sm text-purple-400 hover:text-purple-300 font-semibold" data-id="${challenge.id}">✨ Get a Hint</button></div>
+                        <div class="hint-container bg-slate-700/50 p-4 rounded-md text-slate-300 text-sm hidden mb-4"></div>
                         <p class="text-slate-300 whitespace-pre-wrap mb-6">${challenge.description}</p>
                         <div class="mb-6"><h3 class="font-semibold text-lg text-white mb-2">Expected Screen Output</h3><pre class="bg-slate-900 rounded-md p-4 font-mono text-sm text-green-300">${challenge.screenOutput || 'N/A'}</pre></div>
                         ${testingTableRows ? `<div class="mb-6"><h3 class="font-semibold text-lg text-white mb-2">Testing Table</h3><div class="overflow-x-auto"><table class="w-full text-sm text-left text-slate-300 bg-slate-700 rounded-md"><thead class="bg-slate-600 text-xs uppercase"><tr><th class="p-2">Test</th><th class="p-2">Input</th><th class="p-2">Output</th></tr></thead><tbody>${testingTableRows}</tbody></table></div></div>` : ''}
-                        <div>
-                            <h3 class="font-semibold text-lg text-white mb-2">Solution</h3>
-                            <div class="solution-container" id="solution-${index}"><div class="password-gate flex items-center gap-2"><input type="password" placeholder="Enter password to view" class="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg p-2 w-full max-w-xs"><button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-sm">Show</button></div><pre class="solution-code bg-slate-900 rounded-md p-4 font-mono text-sm text-cyan-300 hidden mt-2"></pre></div>
-                        </div>
+                        <div><h3 class="font-semibold text-lg text-white mb-2">Solution</h3><div class="solution-container" id="solution-${challenge.id}"><div class="password-gate flex items-center gap-2"><input type="password" placeholder="Enter password to view" class="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg p-2 w-full max-w-xs"><button class="show-solution-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-sm">Show</button></div><pre class="solution-code bg-slate-900 rounded-md p-4 font-mono text-sm text-cyan-300 hidden mt-2"></pre><div class="explain-container mt-2"></div></div></div>
                     </div>`;
                 challengesContainer.appendChild(challengeElement);
-                const solutionContainer = challengeElement.querySelector(`#solution-${index}`);
-                solutionContainer.querySelector('button').addEventListener('click', () => {
-                    const passInput = solutionContainer.querySelector('input[type="password"]');
-                    if (passInput.value === '90210') {
-                        solutionContainer.querySelector('.solution-code').textContent = challenge.solution || 'No solution.';
-                        solutionContainer.querySelector('.solution-code').classList.remove('hidden');
-                        solutionContainer.querySelector('.password-gate').classList.add('hidden');
-                    } else { passInput.value = ''; passInput.placeholder = 'Incorrect password!';}
-                });
             });
         }
         
@@ -244,7 +130,7 @@
                  renderChallenges(challenges);
             } catch (error) {
                 console.error("Error fetching challenges:", error);
-                challengesContainer.innerHTML = `<p class="text-center text-red-400">Could not load challenges. You may need to create a Firestore index. Check the browser console for a link to create it.</p>`;
+                challengesContainer.innerHTML = `<p class="text-center text-red-400">Could not load challenges. Check browser console for index link.</p>`;
             }
         }
 
@@ -263,17 +149,59 @@
             }
         }
         
-        helpBtn.addEventListener('click', () => helpModal.classList.remove('hidden'));
-        closeHelpBtn.addEventListener('click', () => helpModal.classList.add('hidden'));
-
-        challengesContainer.addEventListener('click', e => {
-            const deleteBtn = e.target.closest('.delete-challenge-btn');
+        document.addEventListener('click', async (e) => {
             const rankBtn = e.target.closest('.rank-btn');
-            if (deleteBtn) openDeleteModal(deleteBtn.dataset.id);
             if (rankBtn) handleRankUpdate(rankBtn.dataset.id, rankBtn.dataset.rank, rankBtn.dataset.change);
+            
+            const deleteBtn = e.target.closest('.delete-challenge-btn');
+            if (deleteBtn) {
+                const modal = document.getElementById('delete-modal');
+                modal.classList.remove('hidden');
+                document.getElementById('delete-form').onsubmit = (event) => {
+                    event.preventDefault();
+                    handleDeleteChallenge(deleteBtn.dataset.id);
+                }
+                document.getElementById('cancel-delete-btn').onclick = () => modal.classList.add('hidden');
+            }
+
+            const showSolutionBtn = e.target.closest('.show-solution-btn');
+            if (showSolutionBtn) {
+                const container = showSolutionBtn.closest('.solution-container');
+                const passwordInput = container.querySelector('input[type="password"]');
+                if (passwordInput.value === '90210') {
+                    const challenge = challengesCache.find(c => `solution-${c.id}` === container.id);
+                    container.querySelector('.solution-code').textContent = challenge.solution || 'No solution provided.';
+                    container.querySelector('.solution-code').classList.remove('hidden');
+                    container.querySelector('.password-gate').classList.add('hidden');
+                    container.querySelector('.explain-container').innerHTML = `<button class="explain-solution-btn text-sm text-purple-400 hover:text-purple-300 font-semibold" data-id="${challenge.id}">✨ Explain this Solution</button>`;
+                } else {
+                    passwordInput.value = '';
+                    passwordInput.placeholder = 'Incorrect password!';
+                }
+            }
+            
+            const hintBtn = e.target.closest('.get-hint-btn');
+            if (hintBtn) {
+                const challenge = challengesCache.find(c => c.id === hintBtn.dataset.id);
+                const hintContainer = hintBtn.parentElement.nextElementSibling;
+                hintContainer.classList.remove('hidden');
+                hintContainer.innerHTML = `<div class="flex items-center gap-2"><div class="spinner w-4 h-4 rounded-full border-2 border-t-blue-300 border-r-blue-300 border-b-blue-300"></div><span>Getting a hint...</span></div>`;
+                const prompt = `Provide a short, one or two-sentence hint for a beginner programmer for the following challenge. Do not give away the solution. Challenge: "${challenge.title}: ${challenge.description}"`;
+                const hint = await callGeminiAPI(prompt);
+                hintContainer.innerHTML = hint;
+            }
+
+            const explainBtn = e.target.closest('.explain-solution-btn');
+            if (explainBtn) {
+                const challenge = challengesCache.find(c => c.id === explainBtn.dataset.id);
+                const explainContainer = explainBtn.parentElement;
+                explainContainer.innerHTML = `<div class="flex items-center gap-2 mt-4"><div class="spinner w-4 h-4 rounded-full border-2 border-t-blue-300 border-r-blue-300 border-b-blue-300"></div><span>Generating explanation...</span></div>`;
+                const prompt = `Explain the following Python code solution for the given challenge. Break it down step-by-step in simple terms for a beginner. Challenge: "${challenge.title}: ${challenge.description}". Solution:\n\`\`\`python\n${challenge.solution}\n\`\`\``;
+                const explanation = await callGeminiAPI(prompt);
+                explainContainer.innerHTML = `<div class="mt-4 bg-slate-700/50 p-4 rounded-md text-slate-300 text-sm whitespace-pre-wrap">${explanation}</div>`;
+            }
         });
-        deleteForm.addEventListener('submit', e => { e.preventDefault(); handleDeleteChallenge(); });
-        cancelDeleteBtn.addEventListener('click', closeDeleteModal);
+        
         document.addEventListener('DOMContentLoaded', main);
     </script>
 </body>
