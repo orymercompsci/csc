@@ -227,7 +227,7 @@
             currentThemeColorClass = `text-${style.color}-600`;
             document.getElementById('topic-title').textContent = style.name; 
             document.getElementById('page-header').classList.add(`border-${style.color}-500`); 
-            document.body.className = document.body.className.replace(/bg-gray-100/g, `bg-${style.color}-50`); 
+            document.body.className = document.body.className.replace(/bg-gray-100/g, `bg-${style.color}-100`); 
         }
         
         function openModal(modal) { modal.classList.remove('hidden'); }
