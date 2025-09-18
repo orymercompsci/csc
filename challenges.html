@@ -78,6 +78,7 @@
         let challengeToEditId = null;
         let challengeToDeleteId = null;
         let rankChangeData = {};
+        let currentThemeColorClass = 'text-gray-900'; // ADDED: Default theme color
 
         const challengesContainer = document.getElementById('challenges-container');
         
@@ -217,7 +218,15 @@
         const COMMAND_DATA = parseCommandData(COMMAND_DATA_TEXT);
 
         function getTopicFromURL() { return new URLSearchParams(window.location.search).get('topic') || 'default'; }
-        function applyTheme(topic) { const style = TOPIC_STYLES[topic] || TOPIC_STYLES.default; document.getElementById('topic-title').textContent = style.name; document.getElementById('page-header').classList.add(`border-${style.color}-500`); document.body.className = document.body.className.replace(/bg-gray-100/g, `bg-${style.color}-50`); }
+        
+        // UPDATED: This function now sets the global theme color class
+        function applyTheme(topic) { 
+            const style = TOPIC_STYLES[topic] || TOPIC_STYLES.default;
+            currentThemeColorClass = `text-${style.color}-600`; // Use a slightly darker shade for contrast
+            document.getElementById('topic-title').textContent = style.name; 
+            document.getElementById('page-header').classList.add(`border-${style.color}-500`); 
+            document.body.className = document.body.className.replace(/bg-gray-100/g, `bg-${style.color}-50`); 
+        }
         
         function openModal(modal) { modal.classList.remove('hidden'); }
         function closeModal(modal) { modal.classList.add('hidden'); }
@@ -253,7 +262,8 @@
                     </div>
                     <div class="absolute top-4 left-4 flex flex-col items-center"><button class="rank-btn" data-id="${challenge.id}" data-rank="${challenge.rank || 0}" data-change="1" title="Increase Rank"><svg class="w-6 h-6 text-gray-400 hover:text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg></button><span class="font-bold text-xl text-gray-800" title="Current Rank">${challenge.rank || 0}</span><button class="rank-btn" data-id="${challenge.id}" data-rank="${challenge.rank || 0}" data-change="-1" title="Decrease Rank"><svg class="w-6 h-6 text-gray-400 hover:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button></div>
                     <div class="p-6 pl-20 pr-12">
-                        <h2 class="text-2xl font-bold text-gray-900 mb-1">${challenge.title}</h2>
+                        <!-- UPDATED: Added the theme color class to the h2 element -->
+                        <h2 class="text-2xl font-bold mb-1 ${currentThemeColorClass}">${challenge.title}</h2>
                         ${commandTags ? `<div class="text-xs text-gray-500 mb-4">Commands Used: ${commandTags}</div>` : ''}
                         <div class="text-gray-700 mb-6 description-content">${challenge.description}</div>
                         <div class="mb-6"><h3 class="font-semibold text-lg text-gray-800 mb-2">Expected Screen Output</h3><pre class="bg-gray-200 text-gray-800 rounded-md p-4 font-mono text-sm">${challenge.screenOutput || 'N/A'}</pre></div>
