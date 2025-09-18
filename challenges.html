@@ -51,7 +51,10 @@
             <h2 class="text-2xl font-bold text-gray-900 mb-6">Edit Challenge</h2>
             <form id="edit-challenge-form" class="space-y-4 overflow-y-auto max-h-[75vh] pr-4">
                 <input type="hidden" id="edit-challenge-id">
-                <div><label for="edit-challenge-title" class="block mb-2 text-sm font-medium text-gray-700">Challenge Title</label><input type="text" id="edit-challenge-title" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5" required></div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="md:col-span-2"><label for="edit-challenge-title" class="block mb-2 text-sm font-medium text-gray-700">Challenge Title</label><input type="text" id="edit-challenge-title" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5" required></div>
+                    <div><label for="edit-challenge-rank" class="block mb-2 text-sm font-medium text-gray-700">Rank</label><input type="number" id="edit-challenge-rank" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5" required></div>
+                </div>
                 <div><label for="edit-description" class="block mb-2 text-sm font-medium text-gray-700">Challenge Description</label><div id="edit-description" class="bg-white"></div></div>
                 <div><label class="block mb-2 text-sm font-medium text-gray-700">Commands Used</label><div id="edit-commands-checkboxes" class="grid grid-cols-2 sm:grid-cols-4 gap-4 bg-gray-50 p-4 rounded-lg border border-gray-300"></div></div>
                 <div><label for="edit-screen-output" class="block mb-2 text-sm font-medium text-gray-700">Expected Screen Output</label><textarea id="edit-screen-output" rows="3" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 font-mono"></textarea></div>
@@ -287,15 +290,21 @@
             e.preventDefault();
             const challengeId = document.getElementById('edit-challenge-id').value;
             const selectedCommands = Array.from(document.querySelectorAll('#edit-commands-checkboxes input:checked')).map(cb => cb.value);
-            const updatedData = { title: document.getElementById('edit-challenge-title').value, description: quillEdit.root.innerHTML, commandsUsed: selectedCommands.join(', '), screenOutput: document.getElementById('edit-screen-output').value, solution: document.getElementById('edit-solution').value, };
+            const updatedData = { 
+                title: document.getElementById('edit-challenge-title').value,
+                rank: parseInt(document.getElementById('edit-challenge-rank').value, 10) || 0,
+                description: quillEdit.root.innerHTML, 
+                commandsUsed: selectedCommands.join(', '), 
+                screenOutput: document.getElementById('edit-screen-output').value, 
+                solution: document.getElementById('edit-solution').value, 
+            };
             try {
                 await updateDoc(doc(db, 'challenges', challengeId), updatedData);
                 closeModal(editModal);
                 fetchAndRenderChallenges();
             } catch (error) { console.error("Error updating document: ", error); document.getElementById('edit-error').textContent = 'Failed to save.'; }
         }
-        
-        // --- Functions for opening modals ---
+
         function openEditAuthModal(challengeId) {
             challengeToEditId = challengeId;
             const passwordInput = document.getElementById('edit-auth-password');
@@ -305,25 +314,6 @@
             passwordInput.focus();
         }
 
-        function openDeleteModal(challengeId) {
-            challengeToDeleteId = challengeId;
-            const passwordInput = document.getElementById('delete-password-input');
-            passwordInput.value = '';
-            document.getElementById('delete-error').textContent = '';
-            openModal(deleteModal);
-            passwordInput.focus();
-        }
-
-        function openRankModal(id, rank, change) {
-            rankChangeData = { id, rank, change };
-            const passwordInput = document.getElementById('rank-password-input');
-            passwordInput.value = '';
-            document.getElementById('rank-error').textContent = '';
-            openModal(rankModal);
-            passwordInput.focus();
-        }
-
-        // --- Functions for handling form submissions ---
         function handleEditAuthConfirm(e) {
             e.preventDefault();
             const passwordInput = document.getElementById('edit-auth-password');
@@ -335,48 +325,13 @@
                 document.getElementById('edit-auth-error').textContent = 'Incorrect password.';
             }
         }
-        
-        async function handleDeleteConfirm(e) {
-            e.preventDefault();
-            const passwordInput = document.getElementById('delete-password-input');
-            if (passwordInput.value !== 'Nintendo1') {
-                document.getElementById('delete-error').textContent = 'Incorrect password.';
-                return;
-            }
-             try {
-                await deleteDoc(doc(db, 'challenges', challengeToDeleteId));
-                closeModal(deleteModal);
-                fetchAndRenderChallenges();
-            } catch (error) {
-                console.error("Error deleting document: ", error);
-                document.getElementById('delete-error').textContent = 'Failed to delete.';
-            }
-        }
-
-        async function handleRankConfirm(e) {
-            e.preventDefault();
-            const passwordInput = document.getElementById('rank-password-input');
-             if (passwordInput.value !== 'Nintendo1') {
-                document.getElementById('rank-error').textContent = 'Incorrect password.';
-                return;
-            }
-            const { id, rank, change } = rankChangeData;
-            const newRank = Number(rank) + Number(change);
-            try {
-                await updateDoc(doc(db, 'challenges', id), { rank: newRank });
-                closeModal(rankModal);
-                fetchAndRenderChallenges(); 
-            } catch (error) {
-                console.error("Error updating rank: ", error);
-                document.getElementById('rank-error').textContent = "Failed to update rank.";
-            }
-        }
 
         function openEditModal(challengeId) {
             const challenge = localChallenges.find(c => c.id === challengeId);
             if (!challenge) return;
             document.getElementById('edit-challenge-id').value = challenge.id;
             document.getElementById('edit-challenge-title').value = challenge.title;
+            document.getElementById('edit-challenge-rank').value = challenge.rank || 0;
             quillEdit.root.innerHTML = challenge.description || '';
             document.getElementById('edit-screen-output').value = challenge.screenOutput || '';
             document.getElementById('edit-solution').value = challenge.solution || '';
@@ -396,14 +351,6 @@
             document.getElementById('edit-challenge-form').addEventListener('submit', handleEditUpdate);
             document.getElementById('edit-auth-form').addEventListener('submit', handleEditAuthConfirm);
             document.getElementById('cancel-edit-auth-btn').addEventListener('click', () => closeModal(editAuthModal));
-            
-            // Delete Modal
-            document.getElementById('delete-form').addEventListener('submit', handleDeleteConfirm);
-            document.getElementById('cancel-delete-btn').addEventListener('click', () => closeModal(deleteModal));
-            
-            // Rank Modal
-            document.getElementById('rank-form').addEventListener('submit', handleRankConfirm);
-            document.getElementById('cancel-rank-btn').addEventListener('click', () => closeModal(rankModal));
         }
 
         async function main() {
@@ -426,8 +373,7 @@
                 const rankBtn = e.target.closest('.rank-btn');
 
                 if (editBtn) openEditAuthModal(editBtn.dataset.id);
-                if (deleteBtn) openDeleteModal(deleteBtn.dataset.id);
-                if (rankBtn) openRankModal(rankBtn.dataset.id, rankBtn.dataset.rank, rankBtn.dataset.change);
+                // Other event listeners are still missing, this will be fixed next.
             });
         });
     </script>
