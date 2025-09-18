@@ -54,8 +54,18 @@
         import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
         
         let db, auth, quill, isPasswordCorrect = false, isSubmitting = false;
+        
+        // Form Elements
         const form = document.getElementById("add-challenge-form");
         const submitBtn = document.getElementById("submit-btn");
+        const statusMessage = document.getElementById("status-message");
+
+        // Password Elements
+        const passwordOverlay = document.getElementById("password-overlay");
+        const passwordForm = document.getElementById("password-form");
+        const passwordInput = document.getElementById("password-input");
+        const passwordError = document.getElementById("password-error");
+        const mainContent = document.getElementById("main-content");
         
         const COMMAND_DATA_TEXT = `
             print()
@@ -194,6 +204,61 @@
             `).join('');
         }
         
+        function updateStatus(message, type = "success") {
+            statusMessage.textContent = message;
+            statusMessage.className = `mt-6 text-center text-sm font-medium ${type === "success" ? "text-green-500" : "text-red-500"}`;
+        }
+
+        function setupPasswordProtection() {
+            passwordForm.addEventListener("submit", e => {
+                e.preventDefault();
+                passwordError.textContent = "";
+                if (passwordInput.value === "Nintendo1") {
+                    isPasswordCorrect = true;
+                    passwordOverlay.classList.add("hidden");
+                    mainContent.classList.remove("blur-sm");
+                    if (auth && auth.currentUser) {
+                        submitBtn.disabled = false;
+                    }
+                } else {
+                    passwordError.textContent = "Incorrect password. Please try again.";
+                    passwordInput.value = "";
+                    passwordInput.focus();
+                }
+            });
+        }
+
+        async function initializeFirebase() {
+            try {
+                if (typeof firebaseConfig === 'undefined' || !firebaseConfig.projectId) {
+                    throw new Error("Firebase config object is missing or invalid.");
+                }
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                await authenticate();
+            } catch (e) {
+                console.error("Firebase initialization failed:", e);
+                updateStatus("Could not connect to the database. Check config.", "error");
+            }
+        }
+
+        async function authenticate() {
+            try {
+                await signInAnonymously(auth);
+                if (isPasswordCorrect) {
+                    submitBtn.disabled = false;
+                }
+            } catch (e) {
+                console.error("Authentication failed:", e);
+                if (e.code === 'auth/configuration-not-found') {
+                    updateStatus("Authentication failed: 'Anonymous' sign-in is not enabled.", "error");
+                } else {
+                    updateStatus("Authentication failed.", "error");
+                }
+            }
+        }
+
         form.addEventListener("submit", async e => { 
             e.preventDefault();
             if (isSubmitting || !db || !auth.currentUser) return;
@@ -220,21 +285,27 @@
             
             try {
                 await addDoc(collection(db, "challenges"), challengeData);
+                updateStatus("Challenge added successfully!", "success");
                 form.reset();
                 quill.setText('');
                 document.querySelectorAll('#commands-checkboxes input').forEach(cb => cb.checked = false);
             } catch (error) {
                 console.error("Error adding document: ", error);
+                updateStatus("Failed to add challenge.", "error");
             } finally {
                 isSubmitting = false;
                 submitBtn.disabled = false;
                 submitBtn.textContent = "Add Challenge";
+                setTimeout(() => updateStatus(""), 3000);
             }
         }); 
 
         document.addEventListener("DOMContentLoaded", () => { 
+            submitBtn.disabled = true; // Initially disable the main submit button
             quill = new Quill('#challenge-description', { theme: 'snow', modules: { toolbar: [[ 'bold', 'italic', 'underline' ], [{ 'list': 'ordered'}, { 'list': 'bullet' }], [{ 'indent': '-1'}, { 'indent': '+1' }]] } });
             populateCommandsCheckboxes();
+            setupPasswordProtection();
+            initializeFirebase();
         });
     </script>
 </body>
