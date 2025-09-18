@@ -51,6 +51,10 @@
                         <input type="text" id="challenge-title" name="title" class="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg block w-full p-2.5" placeholder="e.g., 'Sum of Two Numbers'" required>
                     </div>
                 </div>
+                 <div>
+                    <label for="commands-used" class="block mb-2 text-sm font-medium text-slate-300">Commands Used</label>
+                    <input type="text" id="commands-used" name="commandsUsed" class="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg block w-full p-2.5" placeholder="e.g., print, input, for">
+                </div>
                 <div>
                     <label for="challenge-description" class="block mb-2 text-sm font-medium text-slate-300">Challenge Description</label>
                     <textarea id="challenge-description" name="description" rows="4" class="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg block w-full p-2.5" placeholder="Describe the challenge." required></textarea>
@@ -130,6 +134,7 @@
             const challengeData = {
                 topic: formData.get('topic'), title: formData.get('title'), description: formData.get('description'),
                 screenOutput: formData.get('screenOutput'), solution: formData.get('solution'), testingTable: testingTable,
+                commandsUsed: formData.get('commandsUsed') || '',
                 rank: 0, createdAt: serverTimestamp()
             };
             try {
