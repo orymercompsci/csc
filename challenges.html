@@ -33,7 +33,6 @@
             <h1 id="topic-title" class="text-4xl md:text-5xl font-bold text-gray-900">Loading Challenges...</h1>
             <div class="flex justify-center items-center gap-6 mt-4">
                 <a href="index.html" class="text-sm text-gray-500 hover:text-gray-800 transition">&larr; Back to Home</a>
-                <button id="help-btn" class="text-sm text-blue-600 hover:text-blue-800 font-semibold">Commands Help</button>
             </div>
         </header>
 
@@ -41,9 +40,6 @@
             <div id="loading-spinner" class="text-center"><p class="text-lg text-gray-600">Fetching challenges from the database...</p></div>
         </main>
     </div>
-
-    <!-- Help Modal -->
-    <div id="help-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden"><div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-4xl relative max-h-[90vh]"><button id="close-help-btn" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button><h2 class="text-2xl font-bold text-gray-900 mb-6">Commands Reference</h2><div id="help-content" class="overflow-y-auto max-h-[75vh] pr-4"></div></div></div>
 
     <!-- Edit Password Modal -->
     <div id="edit-auth-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden"><div class="bg-white p-8 rounded-lg shadow-xl text-center w-full max-w-sm"><h2 class="text-2xl font-bold text-gray-900 mb-4">Admin Access Required</h2><p class="text-gray-600 mb-6">Enter password to edit this challenge.</p><form id="edit-auth-form" class="flex flex-col gap-4"><input type="password" id="edit-auth-password" class="bg-gray-200 border-gray-400 text-sm rounded-lg p-2.5 text-center" placeholder="Password" required><div class="flex gap-4"><button type="button" id="cancel-edit-auth-btn" class="w-full text-gray-800 bg-gray-200 hover:bg-gray-300 font-medium rounded-lg text-sm px-5 py-2.5">Cancel</button><button type="submit" class="w-full text-white bg-blue-600 hover:bg-blue-700 font-medium rounded-lg text-sm px-5 py-2.5">Continue</button></div><p id="edit-auth-error" class="text-red-500 text-sm mt-2 h-4"></p></form></div></div>
@@ -85,7 +81,6 @@
 
         const challengesContainer = document.getElementById('challenges-container');
         
-        const helpModal = document.getElementById('help-modal');
         const deleteModal = document.getElementById('delete-modal');
         const rankModal = document.getElementById('rank-modal');
         const editModal = document.getElementById('edit-modal');
@@ -237,7 +232,15 @@
             challenges.forEach((challenge, index) => {
                 const commandTags = (challenge.commandsUsed || '').split(',').map(cmd => cmd.trim().toLowerCase()).filter(Boolean).map(cmdKey => {
                     const commandInfo = COMMAND_DATA[cmdKey.replace(/\(\)/g, '')] || COMMAND_DATA[cmdKey];
-                    return commandInfo ? `<span class="font-semibold" style="color: ${commandInfo.color};" title="${escapeHTML(commandInfo.example.trim())}">${commandInfo.name}</span>` : `<span>${cmdKey}</span>`;
+                    // FIXED: Replaced default title tooltip with a custom, styled one that correctly preserves whitespace.
+                    return commandInfo ? `
+                        <span class="relative group font-semibold cursor-pointer" style="color: ${commandInfo.color};">
+                            ${commandInfo.name}
+                            <span class="absolute hidden group-hover:block bottom-full mb-2 left-1/2 -translate-x-1/2 w-max max-w-xs bg-gray-800 text-white text-xs rounded-lg p-3 z-10 whitespace-pre-wrap shadow-lg text-left font-mono">
+                                ${escapeHTML(commandInfo.example.trim())}
+                            </span>
+                        </span>
+                    ` : `<span>${cmdKey}</span>`;
                 }).join(', ');
 
                 const challengeElement = document.createElement('div');
