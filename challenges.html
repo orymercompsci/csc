@@ -11,25 +11,41 @@
     <style>
         body { font-family: 'Poppins', sans-serif; transition: background-color 0.5s ease; }
         pre { white-space: pre-wrap; word-wrap: break-word; }
-        #code-editor { font-family: 'Courier New', Courier, monospace; }
+        #code-editor, .help-code-example { font-family: 'Courier New', Courier, monospace; }
     </style>
 </head>
 <body class="bg-slate-900 text-gray-200 min-h-screen">
     <div class="w-full max-w-5xl mx-auto p-4 py-12">
         <header id="page-header" class="relative text-center mb-12 transition-all duration-500 border-b-4 pb-4 rounded-lg">
             <h1 id="topic-title" class="text-4xl md:text-5xl font-bold text-white">Loading Challenges...</h1>
-            <a href="index.html" class="text-sm text-slate-400 hover:text-white transition mt-4 inline-block">&larr; Back to Home</a>
+            <div class="flex justify-center items-center gap-6 mt-4">
+                <a href="index.html" class="text-sm text-slate-400 hover:text-white transition">&larr; Back to Home</a>
+                <button id="help-btn" class="text-sm text-blue-400 hover:text-blue-300 font-semibold">Commands Help</button>
+            </div>
         </header>
         <main id="challenges-container" class="space-y-8">
             <div id="loading-spinner" class="text-center"><p class="text-lg text-slate-400">Fetching challenges from the database...</p></div>
         </main>
     </div>
 
+    <!-- Help Modal -->
+    <div id="help-modal" class="fixed inset-0 bg-slate-900 bg-opacity-95 flex items-center justify-center z-50 hidden">
+        <div class="bg-slate-800 p-6 rounded-lg shadow-xl w-full max-w-3xl relative max-h-[90vh]">
+            <button id="close-help-btn" class="absolute top-4 right-4 text-slate-400 hover:text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+            <h2 class="text-2xl font-bold text-white mb-6">Commands Reference</h2>
+            <div id="help-content" class="overflow-y-auto max-h-[75vh] space-y-6 pr-4">
+                <!-- Help content will be injected here by JavaScript -->
+            </div>
+        </div>
+    </div>
+
     <!-- IDE Modal -->
     <div id="ide-modal" class="fixed inset-0 bg-slate-900 bg-opacity-95 flex items-center justify-center z-50 hidden">
         <div class="bg-slate-800 p-6 rounded-lg shadow-xl w-full max-w-2xl relative">
             <button id="close-ide-btn" class="absolute top-4 right-4 text-slate-400 hover:text-white">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
             <h2 class="text-xl font-bold text-white mb-4">Python IDE</h2>
             <textarea id="code-editor" class="w-full h-64 bg-slate-900 rounded-md font-mono text-sm p-3 text-white border border-slate-600 focus:ring-blue-500 focus:border-blue-500" spellcheck="false"></textarea>
@@ -55,18 +71,147 @@
         const ideModal = document.getElementById('ide-modal');
         const codeEditor = document.getElementById('code-editor');
         const outputArea = document.getElementById('output-area');
+        const helpModal = document.getElementById('help-modal');
         
         const TOPIC_STYLES = { 'sequence': { name: 'Sequence', color: 'red' }, 'selection': { name: 'Selection', color: 'orange' }, 'iteration': { name: 'Iteration', color: 'yellow' }, 'data-structures': { name: 'Data Structures', color: 'green' }, 'file-handling': { name: 'File Handling', color: 'blue' }, 'subprograms': { name: 'Subprograms', color: 'indigo' }, 'exam-questions': { name: 'Exam Questions', color: 'purple' }, 'default': { name: 'Challenges', color: 'slate' } };
-        const COMMAND_DATA = {
-            'print': { color: 'text-red-400', example: 'print("Hello")' },
-            'input': { color: 'text-cyan-400', example: 'name = input("Enter your name: ")\nprint("Hello, " + name)' },
-            'if': { color: 'text-orange-400', example: 'age = 18\nif age >= 18:\n    print("You are an adult.")\nelse:\n    print("You are a minor.")' },
-            'for': { color: 'text-purple-400', example: 'for i in range(5):\n    print(i)' },
-            'while': { color: 'text-pink-400', example: 'count = 0\nwhile count < 3:\n    print("Looping...")\n    count = count + 1' },
-            'def': { color: 'text-yellow-400', example: 'def greet(name):\n    return "Hello, " + name\n\nmessage = greet("Alice")\nprint(message)' },
-            'return': { color: 'text-yellow-500', example: 'def add(a, b):\n    return a + b\n\nresult = add(5, 3)\nprint(result)' },
-            'len': { color: 'text-blue-400', example: 'my_list = [1, 2, 3]\nprint(len(my_list))' }
-        };
+        
+        const COMMAND_DATA_TEXT = `
+            print()
+            #EF4444
+            print("Hello world")
+            name = "Owen"
+            print("Hello", name)
+
+            input()
+            #EF4444
+            wholeNumber = int(input("Enter a whole number"))
+            print("Your number was",wholeNumber)
+            decimalNumber = float(input("Enter a decimal number"))
+            print("Your number was",decimalNumber)
+            word = str(input("Enter a word"))
+            print("Your word was",word)
+
+            len
+            #EF4444
+            name = "Owen"
+            length = len(name)
+            print(length)
+
+            randint
+            #EF4444
+            import random
+            random_number = random.randint(1,10)
+
+            Concatenation
+            #EF4444
+            a = "Hello"
+            b = "World"
+            c = a + b
+            print(c)
+
+            Slicing
+            #EF4444
+            word = "Hello, World!"
+            print(word[6:13])
+
+            1D Array
+            #22C55E
+            fruits = ["apple", "banana", "cherry"]
+            print(fruits[1])
+
+            2D Array
+            #22C55E
+            letters_numbers = [["A","B","C"],["1","2","3"]]
+            print(letters_numbers[0][1],letters_numbers[1][1])
+
+            if
+            #F97316
+            colour = str(input("Enter a colour :"))
+            if colour == "blue":
+              print("The sea is blue")
+
+            if/else
+            #F97316
+            hour = int(input("Enter the hour (24 hour clock) :"))
+            if hour < 18:
+              print("Good day")
+            else:
+              print("Good evening")
+
+            if/elif/else
+            #F97316
+            hour = int(input("Enter the hour (24 hour clock) :"))
+            if hour < 12:
+              print ("Good morning")
+            elif hour < 15:
+              print("Good afternoon")
+            elif hour < 18:
+              print("Good evening")
+            else:
+              print("Good night")
+
+            for
+            #EAB308
+            for loop in range (1,5):
+              print("Loop number ",loop)
+
+            while
+            #EAB308
+            num = 1
+            while num < 11:
+              print("Inside the loop, loop number ",num)
+              num = num + 1
+
+            file.readline()
+            #3B82F6
+            file = open("days.txt",'r')
+            dataRead = file.readline()
+            file.close()
+            print(dataRead)
+
+            file.writelines()
+            #3B82F6
+            file = open("days.txt",'w')
+            dataRead = file.writelines("This text will be written to a file.")
+            file.close()
+
+            Procedures
+            #6366F1
+            def Addition (number1,number2):
+              total = number1 + number2
+              print(total)
+            # Main program
+            number1 = int(input("Enter first number :"))
+            number2 = int(input("Enter second number :"))
+            Addition(number1,number2)
+
+            Functions
+            #6366F1
+            def Addition (number1,number2):
+              total = number1 + number2
+              return total
+            # Main program
+            number1 = int(input("Enter first number :"))
+            number2 = int(input("Enter second number :"))
+            total = Addition(number1,number2)
+            print(total)
+        `;
+
+        function parseCommandData(text) {
+            const commandObject = {};
+            const entries = text.trim().split(/\n\s*\n/);
+            entries.forEach(entry => {
+                const lines = entry.trim().split('\n');
+                const name = lines[0].trim();
+                const color = lines[1].trim();
+                const example = lines.slice(2).join('\n');
+                const key = name.replace(/\(\)/g, '').toLowerCase(); // Normalize key
+                commandObject[key] = { name, color, example };
+            });
+            return commandObject;
+        }
+
+        const COMMAND_DATA = parseCommandData(COMMAND_DATA_TEXT);
 
         function getTopicFromURL() { return new URLSearchParams(window.location.search).get('topic') || 'default'; }
 
@@ -111,8 +256,10 @@
                 
                 const commands = (challenge.commandsUsed || '').split(',').map(cmd => cmd.trim().toLowerCase()).filter(cmd => cmd);
                 const commandsHTML = commands.map(cmd => {
-                    const commandInfo = COMMAND_DATA[cmd] || { color: 'text-slate-400' };
-                    return `<span class="command-tag cursor-pointer ${commandInfo.color} font-mono font-semibold hover:underline" data-command="${cmd}">${cmd}</span>`;
+                    const commandKey = cmd.replace(/\(\)/g, '');
+                    const commandInfo = COMMAND_DATA[commandKey];
+                    const colorStyle = commandInfo ? `color: ${commandInfo.color}` : 'color: #94a3b8'; // slate-400
+                    return `<span class="command-tag cursor-pointer font-mono font-semibold hover:underline" style="${colorStyle}" data-command="${commandKey}">${cmd}</span>`;
                 }).join(', ');
 
                 const challengeElement = document.createElement('div');
@@ -135,6 +282,23 @@
             });
         }
         
+        function populateHelpModal() {
+            const helpContent = document.getElementById('help-content');
+            helpContent.innerHTML = '';
+            for (const key in COMMAND_DATA) {
+                const command = COMMAND_DATA[key];
+                const helpEntry = document.createElement('div');
+                helpEntry.innerHTML = `
+                    <div>
+                        <h3 class="font-bold text-lg" style="color: ${command.color};">${command.name}</h3>
+                        <pre class="bg-slate-900 rounded-md p-4 mt-2 text-sm text-gray-300 help-code-example">${command.example}</pre>
+                        <button class="try-code-btn mt-2 text-white bg-blue-600 hover:bg-blue-700 font-medium rounded-lg text-xs px-3 py-1.5" data-command-key="${key}">Try this code</button>
+                    </div>
+                `;
+                helpContent.appendChild(helpEntry);
+            }
+        }
+
         async function fetchAndRenderChallenges() {
             challengesContainer.innerHTML = `<div id="loading-spinner" class="text-center"><p class="text-lg text-slate-400">Fetching challenges...</p></div>`;
             const topic = getTopicFromURL();
@@ -168,6 +332,7 @@
         async function main() {
             const topic = getTopicFromURL();
             applyTheme(topic);
+            populateHelpModal();
             try {
                  const app = initializeApp(firebaseConfig);
                  db = getFirestore(app);
@@ -220,10 +385,24 @@
                     ideModal.classList.remove('hidden');
                 }
             }
+
+            const tryCodeBtn = e.target.closest('.try-code-btn');
+            if (tryCodeBtn) {
+                const commandKey = tryCodeBtn.dataset.commandKey;
+                const commandInfo = COMMAND_DATA[commandKey];
+                if (commandInfo && commandInfo.example) {
+                    codeEditor.value = commandInfo.example;
+                    outputArea.textContent = '';
+                    helpModal.classList.add('hidden');
+                    ideModal.classList.remove('hidden');
+                }
+            }
         });
         
         document.getElementById('close-ide-btn').addEventListener('click', () => ideModal.classList.add('hidden'));
         document.getElementById('run-code-btn').addEventListener('click', () => runCode(codeEditor.value));
+        document.getElementById('help-btn').addEventListener('click', () => helpModal.classList.remove('hidden'));
+        document.getElementById('close-help-btn').addEventListener('click', () => helpModal.classList.add('hidden'));
         
         document.addEventListener('DOMContentLoaded', main);
     </script>
