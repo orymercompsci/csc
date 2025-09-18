@@ -331,6 +331,7 @@
                 }).join(', ');
 
                 const challengeElement = document.createElement('div');
+                // FIXED: Ensured the background is white for light mode
                 challengeElement.className = `bg-white rounded-lg shadow-lg overflow-hidden relative`;
                 challengeElement.id = `challenge-${challenge.id}`;
                 challengeElement.innerHTML = `
@@ -346,7 +347,9 @@
                         ${testingTableRows ? `<div class="mb-6"><h3 class="font-semibold text-lg text-gray-800 mb-2">Testing Table</h3><div class="overflow-x-auto"><table class="w-full text-sm text-left text-gray-700 bg-gray-50 rounded-md"><thead class="bg-gray-200 text-xs uppercase"><tr><th class="p-2">Test</th><th class="p-2">Input</th><th class="p-2">Output</th></tr></thead><tbody>${testingTableRows}</tbody></table></div></div>` : ''}
                         <div>
                             <h3 class="font-semibold text-lg text-gray-800 mb-2">Solution</h3>
-                            <div class="solution-container" id="solution-${index}"><div class="password-gate flex items-center gap-2"><input type="password" placeholder="Enter password to view" class="bg-gray-200 border border-gray-400 text-sm rounded-lg p-2 w-full max-w-xs"><button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-sm">Show</button></div><pre class="solution-code bg-gray-900 text-cyan-300 rounded-md p-4 font-mono text-sm hidden mt-2"></pre></div>
+                            <div class="solution-container" id="solution-${index}"><div class="password-gate flex items-center gap-2"><input type="password" placeholder="Enter password to view" class="bg-gray-200 border border-gray-400 text-sm rounded-lg p-2 w-full max-w-xs"><button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-sm">Show</button></div>
+                            <!-- FIXED: Changed solution code block to light theme -->
+                            <pre class="solution-code bg-gray-200 text-gray-800 rounded-md p-4 font-mono text-sm hidden mt-2"></pre></div>
                         </div>
                     </div>`;
                 challengesContainer.appendChild(challengeElement);
