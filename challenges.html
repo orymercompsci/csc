@@ -10,12 +10,41 @@
         body { font-family: 'Poppins', sans-serif; transition: background-color 0.5s ease; }
         pre { white-space: pre-wrap; word-wrap: break-word; }
         .help-code-example { font-family: 'Courier New', Courier, monospace; }
-        /* Styles for rich text content */
-        .description-content ul, .description-content ol { margin-left: 1.5rem; margin-bottom: 1rem; }
-        .description-content li { margin-bottom: 0.25rem; }
-        .description-content p { margin-bottom: 0.5rem; }
-        .description-content strong { font-weight: bold; }
-        .description-content em { font-style: italic; }
+
+        /* FIXED: Comprehensive styles for rich text content */
+        .description-content {
+            color: #d1d5db; /* Sets a light default color for all text */
+        }
+        .description-content ul, .description-content ol { 
+            margin-left: 1.5rem; 
+            margin-bottom: 1rem; 
+            list-style-position: outside;
+        }
+        .description-content ul {
+            list-style-type: disc; /* Ensures bullets are visible */
+        }
+        .description-content ol {
+            list-style-type: decimal; /* Ensures numbers are visible */
+        }
+        .description-content li { 
+            margin-bottom: 0.5rem; /* Increased spacing for readability */
+        }
+        .description-content p { 
+            margin-bottom: 1rem; 
+        }
+        .description-content strong { 
+            font-weight: bold; 
+            color: #ffffff;
+        }
+        .description-content em { 
+            font-style: italic; 
+        }
+        .description-content h1, .description-content h2 {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #ffffff;
+            margin-bottom: 0.5rem;
+        }
     </style>
 </head>
 <body class="bg-slate-900 text-gray-200 min-h-screen">
@@ -311,7 +340,6 @@
                         <h2 class="text-2xl font-bold text-white mb-1">${challenge.title}</h2>
                         ${commandTags ? `<div class="text-xs text-slate-400 mb-4">Commands Used: ${commandTags}</div>` : ''}
                         
-                        <!-- FIXED: Use a div to render HTML content correctly -->
                         <div class="text-slate-300 mb-6 description-content">${challenge.description}</div>
                         
                         <div class="mb-6"><h3 class="font-semibold text-lg text-white mb-2">Expected Screen Output</h3><pre class="bg-slate-900 rounded-md p-4 font-mono text-sm text-green-300">${challenge.screenOutput || 'N/A'}</pre></div>
