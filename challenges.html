@@ -240,7 +240,6 @@
             challenges.forEach((challenge, index) => {
                 const commandTags = (challenge.commandsUsed || '').split(',').map(cmd => cmd.trim().toLowerCase()).filter(Boolean).map(cmdKey => {
                     const commandInfo = COMMAND_DATA[cmdKey.replace(/\(\)/g, '')] || COMMAND_DATA[cmdKey];
-                    // REMOVED Tooltips from command tags
                     return commandInfo ? `<span class="font-semibold" style="color: ${commandInfo.color};">${commandInfo.name}</span>` : `<span>${cmdKey}</span>`;
                 }).join(', ');
 
@@ -295,7 +294,8 @@
                 fetchAndRenderChallenges();
             } catch (error) { console.error("Error updating document: ", error); document.getElementById('edit-error').textContent = 'Failed to save.'; }
         }
-
+        
+        // --- Functions for opening modals ---
         function openEditAuthModal(challengeId) {
             challengeToEditId = challengeId;
             const passwordInput = document.getElementById('edit-auth-password');
@@ -305,6 +305,25 @@
             passwordInput.focus();
         }
 
+        function openDeleteModal(challengeId) {
+            challengeToDeleteId = challengeId;
+            const passwordInput = document.getElementById('delete-password-input');
+            passwordInput.value = '';
+            document.getElementById('delete-error').textContent = '';
+            openModal(deleteModal);
+            passwordInput.focus();
+        }
+
+        function openRankModal(id, rank, change) {
+            rankChangeData = { id, rank, change };
+            const passwordInput = document.getElementById('rank-password-input');
+            passwordInput.value = '';
+            document.getElementById('rank-error').textContent = '';
+            openModal(rankModal);
+            passwordInput.focus();
+        }
+
+        // --- Functions for handling form submissions ---
         function handleEditAuthConfirm(e) {
             e.preventDefault();
             const passwordInput = document.getElementById('edit-auth-password');
@@ -314,6 +333,42 @@
                 challengeToEditId = null;
             } else {
                 document.getElementById('edit-auth-error').textContent = 'Incorrect password.';
+            }
+        }
+        
+        async function handleDeleteConfirm(e) {
+            e.preventDefault();
+            const passwordInput = document.getElementById('delete-password-input');
+            if (passwordInput.value !== 'Nintendo1') {
+                document.getElementById('delete-error').textContent = 'Incorrect password.';
+                return;
+            }
+             try {
+                await deleteDoc(doc(db, 'challenges', challengeToDeleteId));
+                closeModal(deleteModal);
+                fetchAndRenderChallenges();
+            } catch (error) {
+                console.error("Error deleting document: ", error);
+                document.getElementById('delete-error').textContent = 'Failed to delete.';
+            }
+        }
+
+        async function handleRankConfirm(e) {
+            e.preventDefault();
+            const passwordInput = document.getElementById('rank-password-input');
+             if (passwordInput.value !== 'Nintendo1') {
+                document.getElementById('rank-error').textContent = 'Incorrect password.';
+                return;
+            }
+            const { id, rank, change } = rankChangeData;
+            const newRank = Number(rank) + Number(change);
+            try {
+                await updateDoc(doc(db, 'challenges', id), { rank: newRank });
+                closeModal(rankModal);
+                fetchAndRenderChallenges(); 
+            } catch (error) {
+                console.error("Error updating rank: ", error);
+                document.getElementById('rank-error').textContent = "Failed to update rank.";
             }
         }
 
@@ -334,11 +389,21 @@
         function setupModals() {
             const editCommandsContainer = document.getElementById('edit-commands-checkboxes');
             editCommandsContainer.innerHTML = Object.values(COMMAND_DATA).map(cmd => `<div class="flex items-center"><input id="edit-cmd-${cmd.name}" type="checkbox" value="${cmd.name}" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded"><label for="edit-cmd-${cmd.name}" class="ml-2 text-sm font-medium text-gray-700">${cmd.name}</label></div>`).join('');
+            
+            // Edit Modals
             document.getElementById('close-edit-btn').addEventListener('click', () => closeModal(editModal));
             document.getElementById('cancel-edit-btn').addEventListener('click', () => closeModal(editModal));
             document.getElementById('edit-challenge-form').addEventListener('submit', handleEditUpdate);
             document.getElementById('edit-auth-form').addEventListener('submit', handleEditAuthConfirm);
             document.getElementById('cancel-edit-auth-btn').addEventListener('click', () => closeModal(editAuthModal));
+            
+            // Delete Modal
+            document.getElementById('delete-form').addEventListener('submit', handleDeleteConfirm);
+            document.getElementById('cancel-delete-btn').addEventListener('click', () => closeModal(deleteModal));
+            
+            // Rank Modal
+            document.getElementById('rank-form').addEventListener('submit', handleRankConfirm);
+            document.getElementById('cancel-rank-btn').addEventListener('click', () => closeModal(rankModal));
         }
 
         async function main() {
@@ -361,11 +426,9 @@
                 const rankBtn = e.target.closest('.rank-btn');
 
                 if (editBtn) openEditAuthModal(editBtn.dataset.id);
-                if (deleteBtn) { /* openDeleteModal logic */ }
-                if (rankBtn) { /* openRankModal logic */ }
+                if (deleteBtn) openDeleteModal(deleteBtn.dataset.id);
+                if (rankBtn) openRankModal(rankBtn.dataset.id, rankBtn.dataset.rank, rankBtn.dataset.change);
             });
-
-            // Add full event listeners for delete and rank forms
         });
     </script>
 </body>
