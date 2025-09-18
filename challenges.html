@@ -9,8 +9,6 @@
     <style>
         body { font-family: 'Poppins', sans-serif; transition: background-color 0.5s ease; }
         pre { white-space: pre-wrap; word-wrap: break-word; }
-        .spinner { border-top-color: #3498db; animation: spin 1s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="bg-slate-900 text-gray-200 min-h-screen">
@@ -36,27 +34,10 @@
         import { getFirestore, collection, getDocs, query, where, orderBy, doc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         let db;
-        let challengesCache = [];
-
+        
         const challengesContainer = document.getElementById('challenges-container');
         
         const TOPIC_STYLES = { 'sequence': { name: 'Sequence', color: 'red' }, 'selection': { name: 'Selection', color: 'orange' }, 'iteration': { name: 'Iteration', color: 'yellow' }, 'data-structures': { name: 'Data Structures', color: 'green' }, 'file-handling': { name: 'File Handling', color: 'blue' }, 'subprograms': { name: 'Subprograms', color: 'indigo' }, 'exam-questions': { name: 'Exam Questions', color: 'purple' }, 'default': { name: 'Challenges', color: 'slate' } };
-
-        async function callGeminiAPI(prompt) {
-            const apiKey = "";
-            const model = 'gemini-2.5-flash-preview-05-20';
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-            const payload = { contents: [{ parts: [{ text: prompt }] }] };
-            try {
-                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                const result = await response.json();
-                return result.candidates?.[0]?.content?.parts?.[0]?.text;
-            } catch (error) {
-                console.error("Gemini API call failed:", error);
-                return "Sorry, I couldn't get a response from the AI. Please try again later.";
-            }
-        }
 
         function getTopicFromURL() { return new URLSearchParams(window.location.search).get('topic') || 'default'; }
 
@@ -91,13 +72,12 @@
         }
 
         function renderChallenges(challenges) {
-            challengesCache = challenges; // Cache the challenges for AI features
             challengesContainer.innerHTML = ''; 
             if (challenges.length === 0) {
                 challengesContainer.innerHTML = `<p class="text-center text-slate-400">No challenges found.</p>`;
                 return;
             }
-            challenges.forEach((challenge, index) => {
+            challenges.forEach((challenge) => {
                 const testingTableRows = (challenge.testingTable || []).map(row => `<tr class="border-b border-slate-700"><td class="p-2">${row.test || ''}</td><td class="p-2">${row.input || ''}</td><td class="p-2">${row.output || ''}</td></tr>`).join('');
                 const challengeElement = document.createElement('div');
                 challengeElement.className = `bg-slate-800 rounded-lg shadow-xl overflow-hidden relative`;
@@ -108,13 +88,11 @@
                     </div>
                     <div class="absolute top-4 left-4 flex flex-col items-center"><button class="rank-btn" data-id="${challenge.id}" data-rank="${challenge.rank || 0}" data-change="1" title="Increase Rank"><svg class="w-6 h-6 text-slate-400 hover:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg></button><span class="font-bold text-lg text-white" title="Current Rank">${challenge.rank || 0}</span><button class="rank-btn" data-id="${challenge.id}" data-rank="${challenge.rank || 0}" data-change="-1" title="Decrease Rank"><svg class="w-6 h-6 text-slate-400 hover:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button></div>
                     <div class="p-6 pl-20 pr-12">
-                        <h2 class="text-2xl font-bold text-white mb-2">${challenge.title}</h2>
-                        <div class="mb-4"><button class="get-hint-btn text-sm text-purple-400 hover:text-purple-300 font-semibold" data-id="${challenge.id}">✨ Get a Hint</button></div>
-                        <div class="hint-container bg-slate-700/50 p-4 rounded-md text-slate-300 text-sm hidden mb-4"></div>
+                        <h2 class="text-2xl font-bold text-white mb-4">${challenge.title}</h2>
                         <p class="text-slate-300 whitespace-pre-wrap mb-6">${challenge.description}</p>
                         <div class="mb-6"><h3 class="font-semibold text-lg text-white mb-2">Expected Screen Output</h3><pre class="bg-slate-900 rounded-md p-4 font-mono text-sm text-green-300">${challenge.screenOutput || 'N/A'}</pre></div>
                         ${testingTableRows ? `<div class="mb-6"><h3 class="font-semibold text-lg text-white mb-2">Testing Table</h3><div class="overflow-x-auto"><table class="w-full text-sm text-left text-slate-300 bg-slate-700 rounded-md"><thead class="bg-slate-600 text-xs uppercase"><tr><th class="p-2">Test</th><th class="p-2">Input</th><th class="p-2">Output</th></tr></thead><tbody>${testingTableRows}</tbody></table></div></div>` : ''}
-                        <div><h3 class="font-semibold text-lg text-white mb-2">Solution</h3><div class="solution-container" id="solution-${challenge.id}"><div class="password-gate flex items-center gap-2"><input type="password" placeholder="Enter password to view" class="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg p-2 w-full max-w-xs"><button class="show-solution-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-sm">Show</button></div><pre class="solution-code bg-slate-900 rounded-md p-4 font-mono text-sm text-cyan-300 hidden mt-2"></pre><div class="explain-container mt-2"></div></div></div>
+                        <div><h3 class="font-semibold text-lg text-white mb-2">Solution</h3><div class="solution-container" data-solution="${encodeURIComponent(challenge.solution || '')}"><div class="password-gate flex items-center gap-2"><input type="password" placeholder="Enter password to view" class="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg p-2 w-full max-w-xs"><button class="show-solution-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-sm">Show</button></div><pre class="solution-code bg-slate-900 rounded-md p-4 font-mono text-sm text-cyan-300 hidden mt-2"></pre></div></div>
                     </div>`;
                 challengesContainer.appendChild(challengeElement);
             });
@@ -169,36 +147,14 @@
                 const container = showSolutionBtn.closest('.solution-container');
                 const passwordInput = container.querySelector('input[type="password"]');
                 if (passwordInput.value === '90210') {
-                    const challenge = challengesCache.find(c => `solution-${c.id}` === container.id);
-                    container.querySelector('.solution-code').textContent = challenge.solution || 'No solution provided.';
-                    container.querySelector('.solution-code').classList.remove('hidden');
+                    const solutionCode = container.querySelector('.solution-code');
+                    solutionCode.textContent = decodeURIComponent(container.dataset.solution);
+                    solutionCode.classList.remove('hidden');
                     container.querySelector('.password-gate').classList.add('hidden');
-                    container.querySelector('.explain-container').innerHTML = `<button class="explain-solution-btn text-sm text-purple-400 hover:text-purple-300 font-semibold" data-id="${challenge.id}">✨ Explain this Solution</button>`;
                 } else {
                     passwordInput.value = '';
                     passwordInput.placeholder = 'Incorrect password!';
                 }
-            }
-            
-            const hintBtn = e.target.closest('.get-hint-btn');
-            if (hintBtn) {
-                const challenge = challengesCache.find(c => c.id === hintBtn.dataset.id);
-                const hintContainer = hintBtn.parentElement.nextElementSibling;
-                hintContainer.classList.remove('hidden');
-                hintContainer.innerHTML = `<div class="flex items-center gap-2"><div class="spinner w-4 h-4 rounded-full border-2 border-t-blue-300 border-r-blue-300 border-b-blue-300"></div><span>Getting a hint...</span></div>`;
-                const prompt = `Provide a short, one or two-sentence hint for a beginner programmer for the following challenge. Do not give away the solution. Challenge: "${challenge.title}: ${challenge.description}"`;
-                const hint = await callGeminiAPI(prompt);
-                hintContainer.innerHTML = hint;
-            }
-
-            const explainBtn = e.target.closest('.explain-solution-btn');
-            if (explainBtn) {
-                const challenge = challengesCache.find(c => c.id === explainBtn.dataset.id);
-                const explainContainer = explainBtn.parentElement;
-                explainContainer.innerHTML = `<div class="flex items-center gap-2 mt-4"><div class="spinner w-4 h-4 rounded-full border-2 border-t-blue-300 border-r-blue-300 border-b-blue-300"></div><span>Generating explanation...</span></div>`;
-                const prompt = `Explain the following Python code solution for the given challenge. Break it down step-by-step in simple terms for a beginner. Challenge: "${challenge.title}: ${challenge.description}". Solution:\n\`\`\`python\n${challenge.solution}\n\`\`\``;
-                const explanation = await callGeminiAPI(prompt);
-                explainContainer.innerHTML = `<div class="mt-4 bg-slate-700/50 p-4 rounded-md text-slate-300 text-sm whitespace-pre-wrap">${explanation}</div>`;
             }
         });
         
