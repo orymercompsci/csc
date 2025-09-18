@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Challenges</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            transition: background-color 0.5s ease;
+        }
+        /* Style for preformatted code blocks */
+        pre {
+            white-space: pre-wrap;       /* Since CSS 2.1 */
+            white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+            white-space: -pre-wrap;      /* Opera 4-6 */
+            white-space: -o-pre-wrap;    /* Opera 7 */
+            word-wrap: break-word;       /* Internet Explorer 5.5+ */
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-gray-200 min-h-screen">
+
+    <div class="w-full max-w-5xl mx-auto p-4 py-12">
+        <header id="page-header" class="text-center mb-12 transition-all duration-500 border-b-4 pb-4 rounded-lg">
+            <h1 id="topic-title" class="text-4xl md:text-5xl font-bold text-white">Loading Challenges...</h1>
+            <a href="index.html" class="text-sm text-slate-400 hover:text-white transition mt-4 inline-block">&larr; Back to Home</a>
+        </header>
+
+        <main id="challenges-container" class="space-y-8">
+            <!-- Challenges will be loaded here by JavaScript -->
+            <div id="loading-spinner" class="text-center">
+                 <p class="text-lg text-slate-400">Fetching challenges from the database...</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- Your web app's Firebase configuration -->
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyDWfJRQhNUgktjIQaFVsoAqhsZtUQD3fpQ",
+        authDomain: "cs-challenges-website.firebaseapp.com",
+        projectId: "cs-challenges-website",
+        storageBucket: "cs-challenges-website.firebasestorage.app",
+        messagingSenderId: "1062820761218",
+        appId: "1:1062820761218:web:ab4382d3f981d3f586ee9b"
+      };
+    </pre>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, collection, getDocs, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const TOPIC_STYLES = {
+            'sequence': { name: 'Sequence', color: 'red', darkBg: 'bg-red-900', lightBg: 'bg-red-800' },
+            'selection': { name: 'Selection', color: 'orange', darkBg: 'bg-orange-900', lightBg: 'bg-orange-800' },
+            'iteration': { name: 'Iteration', color: 'yellow', darkBg: 'bg-yellow-900', lightBg: 'bg-yellow-800' },
+            'data-structures': { name: 'Data Structures', color: 'green', darkBg: 'bg-green-900', lightBg: 'bg-green-800' },
+            'file-handling': { name: 'File Handling', color: 'blue', darkBg: 'bg-blue-900', lightBg: 'bg-blue-800' },
+            'subprograms': { name: 'Subprograms', color: 'indigo', darkBg: 'bg-indigo-900', lightBg: 'bg-indigo-800' },
+            'exam-questions': { name: 'Exam Questions', color: 'purple', darkBg: 'bg-purple-900', lightBg: 'bg-purple-800' },
+            'default': { name: 'Challenges', color: 'slate', darkBg: 'bg-slate-900', lightBg: 'bg-slate-800' }
+        };
+
+        function getTopicFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('topic') || 'default';
+        }
+
+        function applyTheme(topic) {
+            const style = TOPIC_STYLES[topic] || TOPIC_STYLES.default;
+            document.getElementById('topic-title').textContent = style.name;
+            const header = document.getElementById('page-header');
+            header.classList.add(`border-${style.color}-500`);
+            
+            // Set body background color
+            const body = document.querySelector('body');
+            // Remove any existing color classes
+            Object.values(TOPIC_STYLES).forEach(s => body.classList.remove(s.darkBg.replace('bg-', 'bg-')));
+            // Add the new color, but a darker shade
+            body.className = body.className.replace(/bg-\w+-900/g, '');
+            body.classList.add(`bg-${style.color}-900`);
+        }
+
+        function renderChallenges(challenges) {
+            const container = document.getElementById('challenges-container');
+            container.innerHTML = ''; // Clear loading message
+
+            if (challenges.length === 0) {
+                container.innerHTML = `<p class="text-center text-slate-400">No challenges found for this topic yet. Add some from the admin panel!</p>`;
+                return;
+            }
+
+            challenges.forEach((challenge, index) => {
+                const style = TOPIC_STYLES[challenge.topic] || TOPIC_STYLES.default;
+                const testingTableRows = challenge.testingTable.map(row => `
+                    <tr class="border-b border-slate-700">
+                        <td class="p-2">${row.test || ''}</td>
+                        <td class="p-2">${row.input || ''}</td>
+                        <td class="p-2">${row.output || ''}</td>
+                    </tr>
+                `).join('');
+
+                const challengeElement = document.createElement('div');
+                challengeElement.className = `bg-slate-800 rounded-lg shadow-xl overflow-hidden`;
+                challengeElement.innerHTML = `
+                    <div class="p-6">
+                        <h2 class="text-2xl font-bold text-white mb-4">${challenge.title}</h2>
+                        <p class="text-slate-300 whitespace-pre-wrap mb-6">${challenge.description}</p>
+                        
+                        <div class="mb-6">
+                            <h3 class="font-semibold text-lg text-white mb-2">Expected Screen Output</h3>
+                            <pre class="bg-slate-900 rounded-md p-4 font-mono text-sm text-green-300">${challenge.screenOutput || 'N/A'}</pre>
+                        </div>
+
+                        ${challenge.testingTable.length > 0 ? `
+                        <div class="mb-6">
+                            <h3 class="font-semibold text-lg text-white mb-2">Testing Table</h3>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-sm text-left text-slate-300 bg-slate-700 rounded-md">
+                                    <thead class="bg-slate-600 text-xs uppercase">
+                                        <tr>
+                                            <th class="p-2">Test</th>
+                                            <th class="p-2">Input</th>
+                                            <th class="p-2">Output</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>${testingTableRows}</tbody>
+                                </table>
+                            </div>
+                        </div>` : ''}
+
+                        <div>
+                            <h3 class="font-semibold text-lg text-white mb-2">Solution</h3>
+                            <div class="solution-container" id="solution-${index}">
+                                <div class="password-gate">
+                                    <input type="password" placeholder="Enter password to view" class="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg p-2 mr-2">
+                                    <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-sm">Show</button>
+                                </div>
+                                <pre class="solution-code bg-slate-900 rounded-md p-4 font-mono text-sm text-cyan-300 hidden"></pre>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(challengeElement);
+
+                // Add event listener for the password button
+                const button = challengeElement.querySelector('button');
+                const passwordInput = challengeElement.querySelector('input[type="password"]');
+                const solutionCode = challengeElement.querySelector('.solution-code');
+                const passwordGate = challengeElement.querySelector('.password-gate');
+                
+                button.addEventListener('click', () => {
+                    if (passwordInput.value === '90210') {
+                        solutionCode.textContent = challenge.solution || 'No solution provided.';
+                        solutionCode.classList.remove('hidden');
+                        passwordGate.classList.add('hidden');
+                    } else {
+                        alert('Incorrect password.');
+                    }
+                });
+            });
+        }
+
+
+        async function main() {
+            const topic = getTopicFromURL();
+            applyTheme(topic);
+
+            try {
+                 const app = initializeApp(firebaseConfig);
+                 const db = getFirestore(app);
+                 const auth = getAuth(app);
+                 await signInAnonymously(auth);
+
+                 const challengesCol = collection(db, 'challenges');
+                 const q = query(challengesCol, where("topic", "==", topic), orderBy("createdAt", "desc"));
+                 const querySnapshot = await getDocs(q);
+                 
+                 const challenges = [];
+                 querySnapshot.forEach((doc) => {
+                     challenges.push({ id: doc.id, ...doc.data() });
+                 });
+                 
+                 renderChallenges(challenges);
+
+            } catch (error) {
+                console.error("Error fetching challenges:", error);
+                document.getElementById('challenges-container').innerHTML = `<p class="text-center text-red-400">Could not load challenges. Please check the console for errors.</p>`;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', main);
+    </script>
+</body>
+</html>
+
