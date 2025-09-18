@@ -21,6 +21,7 @@
                 <button id="help-btn" class="text-sm text-blue-400 hover:text-blue-300 font-semibold">Commands Help</button>
             </div>
         </header>
+
         <main id="challenges-container" class="space-y-8">
             <div id="loading-spinner" class="text-center"><p class="text-lg text-slate-400">Fetching challenges from the database...</p></div>
         </main>
@@ -41,6 +42,9 @@
 
     <!-- Delete Confirmation Modal -->
     <div id="delete-modal" class="fixed inset-0 bg-slate-900 bg-opacity-95 flex items-center justify-center z-50 hidden"><div class="bg-slate-800 p-8 rounded-lg shadow-xl text-center w-full max-w-sm"><h2 class="text-2xl font-bold text-white mb-4">Confirm Deletion</h2><p class="text-slate-400 mb-6">Enter the admin password to permanently delete this challenge.</p><form id="delete-form" class="flex flex-col gap-4"><input type="password" id="delete-password-input" class="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg p-2.5 text-center" placeholder="Password" required><div class="flex gap-4"><button type="button" id="cancel-delete-btn" class="w-full text-white bg-slate-600 hover:bg-slate-700 font-medium rounded-lg text-sm px-5 py-2.5">Cancel</button><button type="submit" id="confirm-delete-btn" class="w-full text-white bg-red-600 hover:bg-red-700 font-medium rounded-lg text-sm px-5 py-2.5">Delete</button></div><p id="delete-error" class="text-red-400 text-sm mt-2 h-4"></p></form></div></div>
+    
+    <!-- Rank Change Modal -->
+    <div id="rank-modal" class="fixed inset-0 bg-slate-900 bg-opacity-95 flex items-center justify-center z-50 hidden"><div class="bg-slate-800 p-8 rounded-lg shadow-xl text-center w-full max-w-sm"><h2 class="text-2xl font-bold text-white mb-4">Confirm Rank Change</h2><p class="text-slate-400 mb-6">Enter the admin password to change the rank of this challenge.</p><form id="rank-form" class="flex flex-col gap-4"><input type="password" id="rank-password-input" class="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg p-2.5 text-center" placeholder="Password" required><div class="flex gap-4"><button type="button" id="cancel-rank-btn" class="w-full text-white bg-slate-600 hover:bg-slate-700 font-medium rounded-lg text-sm px-5 py-2.5">Cancel</button><button type="submit" id="confirm-rank-btn" class="w-full text-white bg-blue-600 hover:bg-blue-700 font-medium rounded-lg text-sm px-5 py-2.5">Confirm</button></div><p id="rank-error" class="text-red-400 text-sm mt-2 h-4"></p></form></div></div>
 
     <script>
       const firebaseConfig = { apiKey: "AIzaSyDWfJRQhNUgktjIQaFVsoAqhsZtUQD3fpQ", authDomain: "cs-challenges-website.firebaseapp.com", projectId: "cs-challenges-website", storageBucket: "cs-challenges-website.firebasestorage.app", messagingSenderId: "1062820761218", appId: "1:1062820761218:web:ab4382d3f981d3f586ee9b" };
@@ -51,8 +55,25 @@
         import { getFirestore, collection, getDocs, query, where, orderBy, doc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         let db;
+        let challengeToDeleteId = null;
+        let rankChangeData = {};
+
         const challengesContainer = document.getElementById('challenges-container');
         const helpModal = document.getElementById('help-modal');
+        const deleteModal = document.getElementById('delete-modal');
+        const rankModal = document.getElementById('rank-modal');
+        
+        const deleteForm = document.getElementById('delete-form');
+        const rankForm = document.getElementById('rank-form');
+        
+        const deletePasswordInput = document.getElementById('delete-password-input');
+        const rankPasswordInput = document.getElementById('rank-password-input');
+
+        const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+        const cancelRankBtn = document.getElementById('cancel-rank-btn');
+
+        const deleteError = document.getElementById('delete-error');
+        const rankError = document.getElementById('rank-error');
         
         const TOPIC_STYLES = { 'sequence': { name: 'Sequence', color: 'red' }, 'selection': { name: 'Selection', color: 'orange' }, 'iteration': { name: 'Iteration', color: 'yellow' }, 'data-structures': { name: 'Data Structures', color: 'green' }, 'file-handling': { name: 'File Handling', color: 'blue' }, 'subprograms': { name: 'Subprograms', color: 'indigo' }, 'exam-questions': { name: 'Exam Questions', color: 'purple' }, 'default': { name: 'Challenges', color: 'slate' } };
         
@@ -145,17 +166,10 @@
 
             file.readline()
             #3B82F6
-            # file = open("days.txt",'r')
-            # dataRead = file.readline()
-            # file.close()
-            # print(dataRead)
             print("File reading requires a local Python environment.")
 
             file.writelines()
             #3B82F6
-            # file = open("days.txt",'w')
-            # dataRead = file.writelines("This text will be written to a file.")
-            # file.close()
             print("File writing requires a local Python environment.")
 
             Procedures
@@ -202,103 +216,132 @@
             const style = TOPIC_STYLES[topic] || TOPIC_STYLES.default;
             document.getElementById('topic-title').textContent = style.name;
             document.getElementById('page-header').classList.add(`border-${style.color}-500`);
-            document.body.className = document.body.className.replace(/bg-\w+-900/g, '');
-            document.body.classList.add(`bg-${style.color}-900`);
+            document.body.className = document.body.className.replace(/bg-\w+-900/g, `bg-${style.color}-900`);
         }
         
-        async function handleRankUpdate(challengeId, currentRank, change) {
-            const newRank = Number(currentRank) + Number(change);
-            try {
-                await updateDoc(doc(db, 'challenges', challengeId), { rank: newRank });
-                fetchAndRenderChallenges();
-            } catch (error) { console.error("Error updating rank: ", error); }
+        function openDeleteModal(challengeId) {
+            challengeToDeleteId = challengeId;
+            deletePasswordInput.value = '';
+            deleteError.textContent = '';
+            deleteModal.classList.remove('hidden');
+            deletePasswordInput.focus();
         }
 
-        async function handleDeleteChallenge(challengeId) {
-            const password = document.getElementById('delete-password-input').value;
-            const deleteError = document.getElementById('delete-error');
-            if (password !== 'Nintendo1') {
+        function closeDeleteModal() {
+            deleteModal.classList.add('hidden');
+            challengeToDeleteId = null;
+        }
+
+        function openRankModal(id, rank, change) {
+            rankChangeData = { id, rank, change };
+            rankPasswordInput.value = '';
+            rankError.textContent = '';
+            rankModal.classList.remove('hidden');
+            rankPasswordInput.focus();
+        }
+
+        function closeRankModal() {
+            rankModal.classList.add('hidden');
+            rankChangeData = {};
+        }
+
+        async function handleDeleteChallenge() {
+            if (!challengeToDeleteId || deletePasswordInput.value !== 'Nintendo1') {
                 deleteError.textContent = 'Incorrect password.';
                 return;
             }
             try {
-                await deleteDoc(doc(db, 'challenges', challengeId));
-                document.getElementById(`challenge-${challengeId}`).remove();
-                document.getElementById('delete-modal').classList.add('hidden');
-            } catch (error) { deleteError.textContent = 'Failed to delete challenge.'; }
+                await deleteDoc(doc(db, 'challenges', challengeToDeleteId));
+                document.getElementById(`challenge-${challengeToDeleteId}`).remove();
+                closeDeleteModal();
+            } catch (error) {
+                console.error("Error removing document: ", error);
+                deleteError.textContent = 'Failed to delete challenge.';
+            }
         }
 
+        async function handleRankConfirm() {
+            if (rankPasswordInput.value !== 'Nintendo1') {
+                rankError.textContent = 'Incorrect password.';
+                return;
+            }
+            const { id, rank, change } = rankChangeData;
+            const newRank = Number(rank) + Number(change);
+            try {
+                await updateDoc(doc(db, 'challenges', id), { rank: newRank });
+                closeRankModal();
+                fetchAndRenderChallenges(); 
+            } catch (error) {
+                console.error("Error updating rank: ", error);
+                rankError.textContent = "Failed to update rank.";
+            }
+        }
+        
         function renderChallenges(challenges) {
             challengesContainer.innerHTML = ''; 
             if (challenges.length === 0) {
-                challengesContainer.innerHTML = `<p class="text-center text-slate-400">No challenges found.</p>`;
+                challengesContainer.innerHTML = `<p class="text-center text-slate-400">No challenges found for this topic yet.</p>`;
                 return;
             }
-            challenges.forEach((challenge) => {
-                const testingTableRows = (challenge.testingTable || []).map(row => `<tr class="border-b border-slate-700"><td class="p-2">${row.test || ''}</td><td class="p-2">${row.input || ''}</td><td class="p-2">${row.output || ''}</td></tr>`).join('');
+            challenges.forEach((challenge, index) => {
+                const testingTableRows = (challenge.testingTable || []).map(row => `
+                    <tr class="border-b border-slate-700"><td class="p-2">${row.test || ''}</td><td class="p-2">${row.input || ''}</td><td class="p-2">${row.output || ''}</td></tr>`).join('');
                 
-                const commands = (challenge.commandsUsed || '').split(',').map(cmd => cmd.trim().toLowerCase()).filter(cmd => cmd);
-                const commandsHTML = commands.map(cmd => {
-                    const commandKey = cmd.replace(/\(\)/g, '');
-                    const commandInfo = COMMAND_DATA[commandKey];
-                    const colorStyle = commandInfo ? `color: ${commandInfo.color}` : 'color: #94a3b8';
-                    return `<span class="font-mono font-semibold" style="${colorStyle}">${cmd}</span>`;
+                const commandTags = (challenge.commandsUsed || '').split(',').map(cmd => cmd.trim().toLowerCase()).filter(Boolean).map(cmdKey => {
+                    const commandInfo = COMMAND_DATA[cmdKey.replace(/\(\)/g, '')] || COMMAND_DATA[cmdKey];
+                    if (commandInfo) {
+                        return `<span class="font-semibold" style="color: ${commandInfo.color};">${commandInfo.name}</span>`;
+                    }
+                    return `<span>${cmdKey}</span>`;
                 }).join(', ');
 
                 const challengeElement = document.createElement('div');
                 challengeElement.className = `bg-slate-800 rounded-lg shadow-xl overflow-hidden relative`;
                 challengeElement.id = `challenge-${challenge.id}`;
                 challengeElement.innerHTML = `
-                    <div class="absolute top-4 right-4 flex gap-2">
-                         <button class="delete-challenge-btn text-slate-400 hover:text-red-500 transition-colors" title="Delete Challenge" data-id="${challenge.id}"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
-                    </div>
-                    <div class="absolute top-4 left-4 flex flex-col items-center"><button class="rank-btn" data-id="${challenge.id}" data-rank="${challenge.rank || 0}" data-change="1" title="Increase Rank"><svg class="w-6 h-6 text-slate-400 hover:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg></button><span class="font-bold text-lg text-white" title="Current Rank">${challenge.rank || 0}</span><button class="rank-btn" data-id="${challenge.id}" data-rank="${challenge.rank || 0}" data-change="-1" title="Decrease Rank"><svg class="w-6 h-6 text-slate-400 hover:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button></div>
+                    <div class="absolute top-4 right-4"><button class="delete-challenge-btn text-slate-400 hover:text-red-500 transition-colors" title="Delete Challenge" data-id="${challenge.id}"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button></div>
+                    <div class="absolute top-4 left-4 flex flex-col items-center"><button class="rank-btn" data-id="${challenge.id}" data-rank="${challenge.rank || 0}" data-change="1" title="Increase Rank"><svg class="w-6 h-6 text-slate-400 hover:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg></button><span class="font-bold text-xl text-white" title="Current Rank">${challenge.rank || 0}</span><button class="rank-btn" data-id="${challenge.id}" data-rank="${challenge.rank || 0}" data-change="-1" title="Decrease Rank"><svg class="w-6 h-6 text-slate-400 hover:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button></div>
                     <div class="p-6 pl-20 pr-12">
-                        <h2 class="text-2xl font-bold text-white mb-2">${challenge.title}</h2>
-                        ${commandsHTML ? `<div class="mb-4 text-sm"><b>Commands Used:</b> ${commandsHTML}</div>` : ''}
+                        <h2 class="text-2xl font-bold text-white mb-1">${challenge.title}</h2>
+                        ${commandTags ? `<div class="text-xs text-slate-400 mb-4">Commands Used: ${commandTags}</div>` : ''}
                         <p class="text-slate-300 whitespace-pre-wrap mb-6">${challenge.description}</p>
                         <div class="mb-6"><h3 class="font-semibold text-lg text-white mb-2">Expected Screen Output</h3><pre class="bg-slate-900 rounded-md p-4 font-mono text-sm text-green-300">${challenge.screenOutput || 'N/A'}</pre></div>
                         ${testingTableRows ? `<div class="mb-6"><h3 class="font-semibold text-lg text-white mb-2">Testing Table</h3><div class="overflow-x-auto"><table class="w-full text-sm text-left text-slate-300 bg-slate-700 rounded-md"><thead class="bg-slate-600 text-xs uppercase"><tr><th class="p-2">Test</th><th class="p-2">Input</th><th class="p-2">Output</th></tr></thead><tbody>${testingTableRows}</tbody></table></div></div>` : ''}
-                        <div><h3 class="font-semibold text-lg text-white mb-2">Solution</h3><div class="solution-container" data-solution="${encodeURIComponent(challenge.solution || '')}"><div class="password-gate flex items-center gap-2"><input type="password" placeholder="Enter password to view" class="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg p-2 w-full max-w-xs"><button class="show-solution-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-sm">Show</button></div><pre class="solution-code bg-slate-900 rounded-md p-4 font-mono text-sm text-cyan-300 hidden mt-2"></pre></div></div>
+                        <div>
+                            <h3 class="font-semibold text-lg text-white mb-2">Solution</h3>
+                            <div class="solution-container" id="solution-${index}"><div class="password-gate flex items-center gap-2"><input type="password" placeholder="Enter password to view" class="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg p-2 w-full max-w-xs"><button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-sm">Show</button></div><pre class="solution-code bg-slate-900 rounded-md p-4 font-mono text-sm text-cyan-300 hidden mt-2"></pre></div>
+                        </div>
                     </div>`;
                 challengesContainer.appendChild(challengeElement);
+                const solutionContainer = challengeElement.querySelector(`#solution-${index}`);
+                solutionContainer.querySelector('button').addEventListener('click', () => {
+                    const passInput = solutionContainer.querySelector('input[type="password"]');
+                    if (passInput.value === '90210') {
+                        solutionContainer.querySelector('.solution-code').textContent = challenge.solution || 'No solution.';
+                        solutionContainer.querySelector('.solution-code').classList.remove('hidden');
+                        solutionContainer.querySelector('.password-gate').classList.add('hidden');
+                    } else { passInput.value = ''; passInput.placeholder = 'Incorrect password!';}
+                });
             });
         }
         
-        function populateHelpModal() {
-            const helpContent = document.getElementById('help-content');
-            helpContent.innerHTML = '';
-            for (const key in COMMAND_DATA) {
-                const command = COMMAND_DATA[key];
-                const helpEntry = document.createElement('div');
-                helpEntry.innerHTML = `
-                    <div>
-                        <h3 class="font-bold text-lg" style="color: ${command.color};">${command.name}</h3>
-                        <pre class="bg-slate-900 rounded-md p-4 mt-2 text-sm text-gray-300 help-code-example">${command.example}</pre>
-                    </div>
-                `;
-                helpContent.appendChild(helpEntry);
-            }
-        }
-
         async function fetchAndRenderChallenges() {
             challengesContainer.innerHTML = `<div id="loading-spinner" class="text-center"><p class="text-lg text-slate-400">Fetching challenges...</p></div>`;
             const topic = getTopicFromURL();
             try {
-                 const q = query(collection(db, 'challenges'), where("topic", "==", topic), orderBy("rank", "desc"));
+                 const q = query(collection(db, 'challenges'), where("topic", "==", topic), orderBy("rank", "asc"));
                  const querySnapshot = await getDocs(q);
                  const challenges = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                  renderChallenges(challenges);
             } catch (error) {
                 console.error("Error fetching challenges:", error);
-                challengesContainer.innerHTML = `<p class="text-center text-red-400">Could not load challenges. Check browser console for index link.</p>`;
+                challengesContainer.innerHTML = `<p class="text-center text-red-400">Could not load challenges. You may need to create a Firestore index. Check the browser console for a link to create it.</p>`;
             }
         }
 
         async function main() {
             const topic = getTopicFromURL();
             applyTheme(topic);
-            populateHelpModal();
             try {
                  const app = initializeApp(firebaseConfig);
                  db = getFirestore(app);
@@ -310,42 +353,36 @@
                 challengesContainer.innerHTML = `<p class="text-center text-red-400">Could not connect to database.</p>`;
             }
         }
-        
-        document.addEventListener('click', async (e) => {
-            const rankBtn = e.target.closest('.rank-btn');
-            if (rankBtn) handleRankUpdate(rankBtn.dataset.id, rankBtn.dataset.rank, rankBtn.dataset.change);
-            
-            const deleteBtn = e.target.closest('.delete-challenge-btn');
-            if (deleteBtn) {
-                const modal = document.getElementById('delete-modal');
-                modal.classList.remove('hidden');
-                document.getElementById('delete-form').onsubmit = (event) => {
-                    event.preventDefault();
-                    handleDeleteChallenge(deleteBtn.dataset.id);
-                }
-                document.getElementById('cancel-delete-btn').onclick = () => modal.classList.add('hidden');
-            }
 
-            const showSolutionBtn = e.target.closest('.show-solution-btn');
-            if (showSolutionBtn) {
-                const container = showSolutionBtn.closest('.solution-container');
-                const passwordInput = container.querySelector('input[type="password"]');
-                if (passwordInput.value === '90210') {
-                    const solutionCode = container.querySelector('.solution-code');
-                    solutionCode.textContent = decodeURIComponent(container.dataset.solution);
-                    solutionCode.classList.remove('hidden');
-                    container.querySelector('.password-gate').classList.add('hidden');
-                } else {
-                    passwordInput.value = '';
-                    passwordInput.placeholder = 'Incorrect password!';
-                }
-            }
-        });
+        function setupHelpModal() {
+            const helpBtn = document.getElementById('help-btn');
+            const closeHelpBtn = document.getElementById('close-help-btn');
+            const helpContent = document.getElementById('help-content');
+            
+            helpContent.innerHTML = Object.values(COMMAND_DATA).map(cmd => `
+                <div>
+                    <h3 class="text-lg font-bold" style="color:${cmd.color};">${cmd.name}</h3>
+                    <pre class="bg-slate-700 rounded-md p-4 font-mono text-sm text-slate-300 mt-2 help-code-example">${cmd.example.trim()}</pre>
+                </div>
+            `).join('');
+
+            helpBtn.addEventListener('click', () => helpModal.classList.remove('hidden'));
+            closeHelpBtn.addEventListener('click', () => helpModal.classList.add('hidden'));
+        }
         
         document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('help-btn').addEventListener('click', () => helpModal.classList.remove('hidden'));
-            document.getElementById('close-help-btn').addEventListener('click', () => helpModal.classList.add('hidden'));
             main();
+            setupHelpModal();
+            challengesContainer.addEventListener('click', e => {
+                const deleteBtn = e.target.closest('.delete-challenge-btn');
+                const rankBtn = e.target.closest('.rank-btn');
+                if (deleteBtn) openDeleteModal(deleteBtn.dataset.id);
+                if (rankBtn) openRankModal(rankBtn.dataset.id, rankBtn.dataset.rank, rankBtn.dataset.change);
+            });
+            deleteForm.addEventListener('submit', e => { e.preventDefault(); handleDeleteChallenge(); });
+            rankForm.addEventListener('submit', e => { e.preventDefault(); handleRankConfirm(); });
+            cancelDeleteBtn.addEventListener('click', closeDeleteModal);
+            cancelRankBtn.addEventListener('click', closeRankModal);
         });
     </script>
 </body>
