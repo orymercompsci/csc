@@ -62,11 +62,12 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, collection, getDocs, query, where, orderBy, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, query, where, orderBy, doc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         let db;
         let challengeToDeleteId = null;
         
+        const challengesContainer = document.getElementById('challenges-container');
         const deleteModal = document.getElementById('delete-modal');
         const deleteForm = document.getElementById('delete-form');
         const deletePasswordInput = document.getElementById('delete-password-input');
@@ -80,9 +81,7 @@
             'exam-questions': { name: 'Exam Questions', color: 'purple' }, 'default': { name: 'Challenges', color: 'slate' }
         };
 
-        function getTopicFromURL() {
-            return new URLSearchParams(window.location.search).get('topic') || 'default';
-        }
+        function getTopicFromURL() { return new URLSearchParams(window.location.search).get('topic') || 'default'; }
 
         function applyTheme(topic) {
             const style = TOPIC_STYLES[topic] || TOPIC_STYLES.default;
@@ -106,16 +105,12 @@
         }
 
         async function handleDeleteChallenge() {
-            if (!challengeToDeleteId) return;
-
-            if (deletePasswordInput.value !== 'Nintendo1') {
+            if (!challengeToDeleteId || deletePasswordInput.value !== 'Nintendo1') {
                 deleteError.textContent = 'Incorrect password.';
                 return;
             }
-
             try {
-                const challengeRef = doc(db, 'challenges', challengeToDeleteId);
-                await deleteDoc(challengeRef);
+                await deleteDoc(doc(db, 'challenges', challengeToDeleteId));
                 document.getElementById(`challenge-${challengeToDeleteId}`).remove();
                 closeDeleteModal();
             } catch (error) {
@@ -123,73 +118,81 @@
                 deleteError.textContent = 'Failed to delete challenge.';
             }
         }
+        
+        async function handleRankUpdate(challengeId, currentRank, change) {
+            const newRank = Number(currentRank) + Number(change);
+            try {
+                await updateDoc(doc(db, 'challenges', challengeId), { rank: newRank });
+                fetchAndRenderChallenges(); // Re-fetch and re-render to get the correct order
+            } catch (error) {
+                console.error("Error updating rank: ", error);
+                alert("Failed to update rank. See console for details.");
+            }
+        }
 
         function renderChallenges(challenges) {
-            const container = document.getElementById('challenges-container');
-            container.innerHTML = ''; 
-
+            challengesContainer.innerHTML = ''; 
             if (challenges.length === 0) {
-                container.innerHTML = `<p class="text-center text-slate-400">No challenges found for this topic yet.</p>`;
+                challengesContainer.innerHTML = `<p class="text-center text-slate-400">No challenges found for this topic yet.</p>`;
                 return;
             }
-
             challenges.forEach((challenge, index) => {
-                const testingTableRows = challenge.testingTable.map(row => `
-                    <tr class="border-b border-slate-700">
-                        <td class="p-2">${row.test || ''}</td><td class="p-2">${row.input || ''}</td><td class="p-2">${row.output || ''}</td>
-                    </tr>`).join('');
-
+                const testingTableRows = (challenge.testingTable || []).map(row => `
+                    <tr class="border-b border-slate-700"><td class="p-2">${row.test || ''}</td><td class="p-2">${row.input || ''}</td><td class="p-2">${row.output || ''}</td></tr>`).join('');
                 const challengeElement = document.createElement('div');
                 challengeElement.className = `bg-slate-800 rounded-lg shadow-xl overflow-hidden relative`;
                 challengeElement.id = `challenge-${challenge.id}`;
                 challengeElement.innerHTML = `
-                    <button class="delete-challenge-btn absolute top-3 right-3 text-slate-400 hover:text-red-500 transition-colors" title="Delete Challenge">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                    </button>
-                    <div class="p-6">
-                        <h2 class="text-2xl font-bold text-white mb-4 pr-8">${challenge.title}</h2>
+                    <div class="absolute top-4 right-4">
+                        <button class="delete-challenge-btn text-slate-400 hover:text-red-500 transition-colors" title="Delete Challenge" data-id="${challenge.id}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                        </button>
+                    </div>
+                    <div class="absolute top-4 left-4 flex flex-col items-center">
+                        <button class="rank-btn" data-id="${challenge.id}" data-rank="${challenge.rank || 0}" data-change="1" title="Increase Rank">
+                            <svg class="w-6 h-6 text-slate-400 hover:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
+                        </button>
+                        <span class="font-bold text-lg text-white" title="Current Rank">${challenge.rank || 0}</span>
+                        <button class="rank-btn" data-id="${challenge.id}" data-rank="${challenge.rank || 0}" data-change="-1" title="Decrease Rank">
+                            <svg class="w-6 h-6 text-slate-400 hover:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                    </div>
+                    <div class="p-6 pl-20 pr-12">
+                        <h2 class="text-2xl font-bold text-white mb-4">${challenge.title}</h2>
                         <p class="text-slate-300 whitespace-pre-wrap mb-6">${challenge.description}</p>
-                        <div class="mb-6">
-                            <h3 class="font-semibold text-lg text-white mb-2">Expected Screen Output</h3>
-                            <pre class="bg-slate-900 rounded-md p-4 font-mono text-sm text-green-300">${challenge.screenOutput || 'N/A'}</pre>
-                        </div>
-                        ${challenge.testingTable.length > 0 ? `
-                        <div class="mb-6">
-                            <h3 class="font-semibold text-lg text-white mb-2">Testing Table</h3>
-                            <div class="overflow-x-auto"><table class="w-full text-sm text-left text-slate-300 bg-slate-700 rounded-md">
-                                <thead class="bg-slate-600 text-xs uppercase"><tr><th class="p-2">Test</th><th class="p-2">Input</th><th class="p-2">Output</th></tr></thead>
-                                <tbody>${testingTableRows}</tbody>
-                            </table></div>
-                        </div>` : ''}
+                        ${challenge.commandsUsed ? `<div class="mb-6"><h3 class="font-semibold text-lg text-white mb-2">Commands Used</h3><pre class="bg-slate-900 rounded-md p-4 font-mono text-sm text-yellow-300">${challenge.commandsUsed}</pre></div>` : ''}
+                        <div class="mb-6"><h3 class="font-semibold text-lg text-white mb-2">Expected Screen Output</h3><pre class="bg-slate-900 rounded-md p-4 font-mono text-sm text-green-300">${challenge.screenOutput || 'N/A'}</pre></div>
+                        ${testingTableRows ? `<div class="mb-6"><h3 class="font-semibold text-lg text-white mb-2">Testing Table</h3><div class="overflow-x-auto"><table class="w-full text-sm text-left text-slate-300 bg-slate-700 rounded-md"><thead class="bg-slate-600 text-xs uppercase"><tr><th class="p-2">Test</th><th class="p-2">Input</th><th class="p-2">Output</th></tr></thead><tbody>${testingTableRows}</tbody></table></div></div>` : ''}
                         <div>
                             <h3 class="font-semibold text-lg text-white mb-2">Solution</h3>
-                            <div class="solution-container" id="solution-${index}">
-                                <div class="password-gate flex items-center gap-2">
-                                    <input type="password" placeholder="Enter password to view" class="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg p-2 w-full max-w-xs">
-                                    <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-sm">Show</button>
-                                </div>
-                                <pre class="solution-code bg-slate-900 rounded-md p-4 font-mono text-sm text-cyan-300 hidden mt-2"></pre>
-                            </div>
+                            <div class="solution-container" id="solution-${index}"><div class="password-gate flex items-center gap-2"><input type="password" placeholder="Enter password to view" class="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg p-2 w-full max-w-xs"><button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-sm">Show</button></div><pre class="solution-code bg-slate-900 rounded-md p-4 font-mono text-sm text-cyan-300 hidden mt-2"></pre></div>
                         </div>
                     </div>`;
-                container.appendChild(challengeElement);
-                
-                challengeElement.querySelector('.delete-challenge-btn').addEventListener('click', () => openDeleteModal(challenge.id));
-
+                challengesContainer.appendChild(challengeElement);
                 const solutionContainer = challengeElement.querySelector(`#solution-${index}`);
                 solutionContainer.querySelector('button').addEventListener('click', () => {
-                    const passwordInput = solutionContainer.querySelector('input[type="password"]');
-                    if (passwordInput.value === '90210') {
-                        const solutionCode = solutionContainer.querySelector('.solution-code');
-                        solutionCode.textContent = challenge.solution || 'No solution provided.';
-                        solutionCode.classList.remove('hidden');
+                    const passInput = solutionContainer.querySelector('input[type="password"]');
+                    if (passInput.value === '90210') {
+                        solutionContainer.querySelector('.solution-code').textContent = challenge.solution || 'No solution.';
+                        solutionContainer.querySelector('.solution-code').classList.remove('hidden');
                         solutionContainer.querySelector('.password-gate').classList.add('hidden');
-                    } else {
-                        passwordInput.value = '';
-                        passwordInput.placeholder = 'Incorrect password!';
-                    }
+                    } else { passInput.value = ''; passInput.placeholder = 'Incorrect password!';}
                 });
             });
+        }
+        
+        async function fetchAndRenderChallenges() {
+            challengesContainer.innerHTML = `<div id="loading-spinner" class="text-center"><p class="text-lg text-slate-400">Fetching challenges...</p></div>`;
+            const topic = getTopicFromURL();
+            try {
+                 const q = query(collection(db, 'challenges'), where("topic", "==", topic), orderBy("rank", "desc"));
+                 const querySnapshot = await getDocs(q);
+                 const challenges = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                 renderChallenges(challenges);
+            } catch (error) {
+                console.error("Error fetching challenges:", error);
+                challengesContainer.innerHTML = `<p class="text-center text-red-400">Could not load challenges. You may need to create a Firestore index. Check the browser console for a link to create it.</p>`;
+            }
         }
 
         async function main() {
@@ -200,21 +203,20 @@
                  db = getFirestore(app);
                  const auth = getAuth(app);
                  await signInAnonymously(auth);
-
-                 const q = query(collection(db, 'challenges'), where("topic", "==", topic), orderBy("createdAt", "desc"));
-                 const querySnapshot = await getDocs(q);
-                 const challenges = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                 renderChallenges(challenges);
+                 await fetchAndRenderChallenges();
             } catch (error) {
-                console.error("Error fetching challenges:", error);
-                document.getElementById('challenges-container').innerHTML = `<p class="text-center text-red-400">Could not load challenges.</p>`;
+                console.error("Error initializing Firebase:", error);
+                challengesContainer.innerHTML = `<p class="text-center text-red-400">Could not connect to database.</p>`;
             }
         }
         
-        deleteForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            handleDeleteChallenge();
+        challengesContainer.addEventListener('click', e => {
+            const deleteBtn = e.target.closest('.delete-challenge-btn');
+            const rankBtn = e.target.closest('.rank-btn');
+            if (deleteBtn) openDeleteModal(deleteBtn.dataset.id);
+            if (rankBtn) handleRankUpdate(rankBtn.dataset.id, rankBtn.dataset.rank, rankBtn.dataset.change);
         });
+        deleteForm.addEventListener('submit', e => { e.preventDefault(); handleDeleteChallenge(); });
         cancelDeleteBtn.addEventListener('click', closeDeleteModal);
         document.addEventListener('DOMContentLoaded', main);
     </script>
