@@ -15,14 +15,21 @@
             white-space: pre-wrap;
             word-wrap: break-word;
         }
+        .modal-container {
+            max-height: 80vh;
+        }
     </style>
 </head>
 <body class="bg-slate-900 text-gray-200 min-h-screen">
 
     <div class="w-full max-w-5xl mx-auto p-4 py-12">
-        <header id="page-header" class="text-center mb-12 transition-all duration-500 border-b-4 pb-4 rounded-lg">
+        <header id="page-header" class="relative text-center mb-12 transition-all duration-500 border-b-4 pb-4 rounded-lg">
             <h1 id="topic-title" class="text-4xl md:text-5xl font-bold text-white">Loading Challenges...</h1>
             <a href="index.html" class="text-sm text-slate-400 hover:text-white transition mt-4 inline-block">&larr; Back to Home</a>
+            <button id="help-btn" class="absolute top-0 right-0 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 inline-block -mt-1 mr-1"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                Help
+            </button>
         </header>
 
         <main id="challenges-container" class="space-y-8">
@@ -31,6 +38,49 @@
             </div>
         </main>
     </div>
+
+    <!-- Help Modal -->
+    <div id="help-modal" class="fixed inset-0 bg-slate-900 bg-opacity-95 flex items-center justify-center z-50 hidden">
+        <div class="bg-slate-800 p-8 rounded-lg shadow-xl w-full max-w-3xl modal-container relative">
+            <button id="close-help-btn" class="absolute top-4 right-4 text-slate-400 hover:text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+            <h2 class="text-2xl font-bold text-white mb-6 text-center">Command Reference</h2>
+            <div class="overflow-y-auto pr-4 modal-container">
+                <table class="w-full text-sm text-left text-slate-300">
+                    <thead class="bg-slate-700 text-xs uppercase">
+                        <tr><th class="p-3">Concept</th><th class="p-3">Command</th><th class="p-3">Example</th></tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-700">
+                        <!-- Content will be dynamically inserted here from the PDF data -->
+                        <tr><td class="p-3 font-semibold">Input/Output</td><td class="p-3 font-mono">input(...)</td><td class="p-3 font-mono">myName = input("Enter name")</td></tr>
+                        <tr><td class="p-3 font-semibold"></td><td class="p-3 font-mono">print(...)</td><td class="p-3 font-mono">print("Hello")</td></tr>
+                        <tr><td class="p-3 font-semibold">Variables</td><td class="p-3 font-mono">variable = value</td><td class="p-3 font-mono">x = 3</td></tr>
+                        <tr><td class="p-3 font-semibold"></td><td class="p-3 font-mono">const</td><td class="p-3 font-mono">const vat = 0.2</td></tr>
+                        <tr><td class="p-3 font-semibold">Casting</td><td class="p-3 font-mono">str(), int(), float()</td><td class="p-3 font-mono">str(345), int("3"), float("4.52")</td></tr>
+                        <tr><td class="p-3 font-semibold">Selection</td><td class="p-3 font-mono">if/elif/else/endif</td><td class="p-3 font-mono">if x > 10 then ... else ... endif</td></tr>
+                        <tr><td class="p-3 font-semibold"></td><td class="p-3 font-mono">switch/case/default</td><td class="p-3 font-mono">switch day: case "Sat": ... default: ... endswitch</td></tr>
+                        <tr><td class="p-3 font-semibold">Iteration</td><td class="p-3 font-mono">for i = 0 to 9 ... next i</td><td class="p-3 font-mono">Loops 10 times.</td></tr>
+                        <tr><td class="p-3 font-semibold"></td><td class="p-3 font-mono">while ... endwhile</td><td class="p-3 font-mono">while answer != "Yes" ... endwhile</td></tr>
+                        <tr><td class="p-3 font-semibold"></td><td class="p-3 font-mono">do ... until</td><td class="p-3 font-mono">do ... until answer == "Yes"</td></tr>
+                        <tr><td class="p-3 font-semibold">String Handling</td><td class="p-3 font-mono">.length</td><td class="p-3 font-mono">"Computer".length  (returns 8)</td></tr>
+                        <tr><td class="p-3 font-semibold"></td><td class="p-3 font-mono">.substring(start, len)</td><td class="p-3 font-mono">"Computer".substring(3, 4) (returns "pute")</td></tr>
+                        <tr><td class="p-3 font-semibold"></td><td class="p-3 font-mono">.upper / .lower</td><td class="p-3 font-mono">"Hi".upper (returns "HI")</td></tr>
+                        <tr><td class="p-3 font-semibold">File Handling</td><td class="p-3 font-mono">myFile = open("x.txt")</td><td class="p-3 font-mono">Opens a file.</td></tr>
+                        <tr><td class="p-3 font-semibold"></td><td class="p-3 font-mono">myFile.readLine()</td><td class="p-3 font-mono">Reads the next line.</td></tr>
+                        <tr><td class="p-3 font-semibold"></td><td class="p-3 font-mono">myFile.writeLine("Hi")</td><td class="p-3 font-mono">Writes "Hi" to the file.</td></tr>
+                        <tr><td class="p-3 font-semibold"></td><td class="p-3 font-mono">myFile.close()</td><td class="p-3 font-mono">Closes the file.</td></tr>
+                        <tr><td class="p-3 font-semibold">Sub Programs</td><td class="p-3 font-mono">procedure name()...end</td><td class="p-3 font-mono">A block of code with no return value.</td></tr>
+                        <tr><td class="p-3 font-semibold"></td><td class="p-3 font-mono">function name()...return...end</td><td class="p-3 font-mono">A block of code that returns a value.</td></tr>
+                         <tr><td class="p-3 font-semibold">Arrays</td><td class="p-3 font-mono">array colours[5]</td><td class="p-3 font-mono">Creates an array with 5 elements.</td></tr>
+                        <tr><td class="p-3 font-semibold"></td><td class="p-3 font-mono">colours[0] = "Blue"</td><td class="p-3 font-mono">Assigns "Blue" to the first element.</td></tr>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
 
     <!-- Delete Confirmation Modal -->
     <div id="delete-modal" class="fixed inset-0 bg-slate-900 bg-opacity-95 flex items-center justify-center z-50 hidden">
@@ -73,6 +123,9 @@
         const deletePasswordInput = document.getElementById('delete-password-input');
         const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
         const deleteError = document.getElementById('delete-error');
+        const helpBtn = document.getElementById('help-btn');
+        const helpModal = document.getElementById('help-modal');
+        const closeHelpBtn = document.getElementById('close-help-btn');
 
         const TOPIC_STYLES = {
             'sequence': { name: 'Sequence', color: 'red' }, 'selection': { name: 'Selection', color: 'orange' },
@@ -80,22 +133,6 @@
             'file-handling': { name: 'File Handling', color: 'blue' }, 'subprograms': { name: 'Subprograms', color: 'indigo' },
             'exam-questions': { name: 'Exam Questions', color: 'purple' }, 'default': { name: 'Challenges', color: 'slate' }
         };
-        
-        const commandTooltips = {
-            'print()': 'Example: print("Hello, World!")',
-            'input()': 'Example: name = input("Enter your name: ")',
-            'len()': 'Example: length = len("some_string")',
-            'int()': 'Example: number = int("123")',
-            'str()': 'Example: text = str(123)',
-            'if': 'Example: if x > 10:',
-            'else': 'Example: else:',
-            'elif': 'Example: elif x == 10:',
-            'for': 'Example: for i in range(5):',
-            'while': 'Example: while x < 10:',
-            'def': 'Example: def my_function():'
-        };
-        
-        const commandColors = ['#f87171', '#fb923c', '#facc15', '#4ade80', '#60a5fa', '#a78bfa', '#f472b6'];
 
         function getTopicFromURL() { return new URLSearchParams(window.location.search).get('topic') || 'default'; }
 
@@ -156,17 +193,6 @@
                 const testingTableRows = (challenge.testingTable || []).map(row => `
                     <tr class="border-b border-slate-700"><td class="p-2">${row.test || ''}</td><td class="p-2">${row.input || ''}</td><td class="p-2">${row.output || ''}</td></tr>`).join('');
                 
-                const commandsHtml = (challenge.commandsUsed || '')
-                    .split(',')
-                    .map(cmd => cmd.trim())
-                    .filter(cmd => cmd)
-                    .map((cmd, i) => {
-                        const color = commandColors[i % commandColors.length];
-                        const tooltip = commandTooltips[cmd.toLowerCase()] || `Example for ${cmd}`;
-                        return `<span class="font-mono text-xs px-2 py-1 rounded" style="background-color: ${color}20; color: ${color};" title="${tooltip}">${cmd}</span>`;
-                    })
-                    .join(' ');
-
                 const challengeElement = document.createElement('div');
                 challengeElement.className = `bg-slate-800 rounded-lg shadow-xl overflow-hidden relative`;
                 challengeElement.id = `challenge-${challenge.id}`;
@@ -186,8 +212,7 @@
                         </button>
                     </div>
                     <div class="p-6 pl-20 pr-12">
-                        <h2 class="text-2xl font-bold text-white mb-1">${challenge.title}</h2>
-                        ${commandsHtml ? `<div class="mb-4 space-x-2"><span class="text-sm font-semibold text-slate-300">Commands Used:</span>${commandsHtml}</div>` : ''}
+                        <h2 class="text-2xl font-bold text-white mb-4">${challenge.title}</h2>
                         <p class="text-slate-300 whitespace-pre-wrap mb-6">${challenge.description}</p>
                         <div class="mb-6"><h3 class="font-semibold text-lg text-white mb-2">Expected Screen Output</h3><pre class="bg-slate-900 rounded-md p-4 font-mono text-sm text-green-300">${challenge.screenOutput || 'N/A'}</pre></div>
                         ${testingTableRows ? `<div class="mb-6"><h3 class="font-semibold text-lg text-white mb-2">Testing Table</h3><div class="overflow-x-auto"><table class="w-full text-sm text-left text-slate-300 bg-slate-700 rounded-md"><thead class="bg-slate-600 text-xs uppercase"><tr><th class="p-2">Test</th><th class="p-2">Input</th><th class="p-2">Output</th></tr></thead><tbody>${testingTableRows}</tbody></table></div></div>` : ''}
@@ -238,6 +263,9 @@
             }
         }
         
+        helpBtn.addEventListener('click', () => helpModal.classList.remove('hidden'));
+        closeHelpBtn.addEventListener('click', () => helpModal.classList.add('hidden'));
+
         challengesContainer.addEventListener('click', e => {
             const deleteBtn = e.target.closest('.delete-challenge-btn');
             const rankBtn = e.target.closest('.rank-btn');
