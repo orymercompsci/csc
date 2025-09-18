@@ -11,13 +11,9 @@
             font-family: 'Poppins', sans-serif;
             transition: background-color 0.5s ease;
         }
-        /* Style for preformatted code blocks */
         pre {
-            white-space: pre-wrap;       /* Since CSS 2.1 */
-            white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
-            white-space: -pre-wrap;      /* Opera 4-6 */
-            white-space: -o-pre-wrap;    /* Opera 7 */
-            word-wrap: break-word;       /* Internet Explorer 5.5+ */
+            white-space: pre-wrap;
+            word-wrap: break-word;
         }
     </style>
 </head>
@@ -30,14 +26,28 @@
         </header>
 
         <main id="challenges-container" class="space-y-8">
-            <!-- Challenges will be loaded here by JavaScript -->
             <div id="loading-spinner" class="text-center">
                  <p class="text-lg text-slate-400">Fetching challenges from the database...</p>
             </div>
         </main>
     </div>
 
-    <!-- Your web app's Firebase configuration -->
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" class="fixed inset-0 bg-slate-900 bg-opacity-95 flex items-center justify-center z-50 hidden">
+        <div class="bg-slate-800 p-8 rounded-lg shadow-xl text-center w-full max-w-sm">
+            <h2 class="text-2xl font-bold text-white mb-4">Confirm Deletion</h2>
+            <p class="text-slate-400 mb-6">Enter the admin password to permanently delete this challenge.</p>
+            <form id="delete-form" class="flex flex-col gap-4">
+                <input type="password" id="delete-password-input" class="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg p-2.5 text-center" placeholder="Password" required>
+                <div class="flex gap-4">
+                    <button type="button" id="cancel-delete-btn" class="w-full text-white bg-slate-600 hover:bg-slate-700 font-medium rounded-lg text-sm px-5 py-2.5">Cancel</button>
+                    <button type="submit" id="confirm-delete-btn" class="w-full text-white bg-red-600 hover:bg-red-700 font-medium rounded-lg text-sm px-5 py-2.5">Delete</button>
+                </div>
+                <p id="delete-error" class="text-red-400 text-sm mt-2 h-4"></p>
+            </form>
+        </div>
+    </div>
+
     <script>
       const firebaseConfig = {
         apiKey: "AIzaSyDWfJRQhNUgktjIQaFVsoAqhsZtUQD3fpQ",
@@ -47,152 +57,165 @@
         messagingSenderId: "1062820761218",
         appId: "1:1062820761218:web:ab4382d3f981d3f586ee9b"
       };
-    </pre>
+    </script>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, collection, getDocs, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, query, where, orderBy, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        let db;
+        let challengeToDeleteId = null;
+        
+        const deleteModal = document.getElementById('delete-modal');
+        const deleteForm = document.getElementById('delete-form');
+        const deletePasswordInput = document.getElementById('delete-password-input');
+        const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+        const deleteError = document.getElementById('delete-error');
 
         const TOPIC_STYLES = {
-            'sequence': { name: 'Sequence', color: 'red', darkBg: 'bg-red-900', lightBg: 'bg-red-800' },
-            'selection': { name: 'Selection', color: 'orange', darkBg: 'bg-orange-900', lightBg: 'bg-orange-800' },
-            'iteration': { name: 'Iteration', color: 'yellow', darkBg: 'bg-yellow-900', lightBg: 'bg-yellow-800' },
-            'data-structures': { name: 'Data Structures', color: 'green', darkBg: 'bg-green-900', lightBg: 'bg-green-800' },
-            'file-handling': { name: 'File Handling', color: 'blue', darkBg: 'bg-blue-900', lightBg: 'bg-blue-800' },
-            'subprograms': { name: 'Subprograms', color: 'indigo', darkBg: 'bg-indigo-900', lightBg: 'bg-indigo-800' },
-            'exam-questions': { name: 'Exam Questions', color: 'purple', darkBg: 'bg-purple-900', lightBg: 'bg-purple-800' },
-            'default': { name: 'Challenges', color: 'slate', darkBg: 'bg-slate-900', lightBg: 'bg-slate-800' }
+            'sequence': { name: 'Sequence', color: 'red' }, 'selection': { name: 'Selection', color: 'orange' },
+            'iteration': { name: 'Iteration', color: 'yellow' }, 'data-structures': { name: 'Data Structures', color: 'green' },
+            'file-handling': { name: 'File Handling', color: 'blue' }, 'subprograms': { name: 'Subprograms', color: 'indigo' },
+            'exam-questions': { name: 'Exam Questions', color: 'purple' }, 'default': { name: 'Challenges', color: 'slate' }
         };
 
         function getTopicFromURL() {
-            const params = new URLSearchParams(window.location.search);
-            return params.get('topic') || 'default';
+            return new URLSearchParams(window.location.search).get('topic') || 'default';
         }
 
         function applyTheme(topic) {
             const style = TOPIC_STYLES[topic] || TOPIC_STYLES.default;
             document.getElementById('topic-title').textContent = style.name;
-            const header = document.getElementById('page-header');
-            header.classList.add(`border-${style.color}-500`);
-            
-            // Set body background color
-            const body = document.querySelector('body');
-            // Remove any existing color classes
-            Object.values(TOPIC_STYLES).forEach(s => body.classList.remove(s.darkBg.replace('bg-', 'bg-')));
-            // Add the new color, but a darker shade
-            body.className = body.className.replace(/bg-\w+-900/g, '');
-            body.classList.add(`bg-${style.color}-900`);
+            document.getElementById('page-header').classList.add(`border-${style.color}-500`);
+            document.body.className = document.body.className.replace(/bg-\w+-900/g, '');
+            document.body.classList.add(`bg-${style.color}-900`);
+        }
+        
+        function openDeleteModal(challengeId) {
+            challengeToDeleteId = challengeId;
+            deletePasswordInput.value = '';
+            deleteError.textContent = '';
+            deleteModal.classList.remove('hidden');
+            deletePasswordInput.focus();
+        }
+
+        function closeDeleteModal() {
+            deleteModal.classList.add('hidden');
+            challengeToDeleteId = null;
+        }
+
+        async function handleDeleteChallenge() {
+            if (!challengeToDeleteId) return;
+
+            if (deletePasswordInput.value !== 'Nintendo1') {
+                deleteError.textContent = 'Incorrect password.';
+                return;
+            }
+
+            try {
+                const challengeRef = doc(db, 'challenges', challengeToDeleteId);
+                await deleteDoc(challengeRef);
+                document.getElementById(`challenge-${challengeToDeleteId}`).remove();
+                closeDeleteModal();
+            } catch (error) {
+                console.error("Error removing document: ", error);
+                deleteError.textContent = 'Failed to delete challenge.';
+            }
         }
 
         function renderChallenges(challenges) {
             const container = document.getElementById('challenges-container');
-            container.innerHTML = ''; // Clear loading message
+            container.innerHTML = ''; 
 
             if (challenges.length === 0) {
-                container.innerHTML = `<p class="text-center text-slate-400">No challenges found for this topic yet. Add some from the admin panel!</p>`;
+                container.innerHTML = `<p class="text-center text-slate-400">No challenges found for this topic yet.</p>`;
                 return;
             }
 
             challenges.forEach((challenge, index) => {
-                const style = TOPIC_STYLES[challenge.topic] || TOPIC_STYLES.default;
                 const testingTableRows = challenge.testingTable.map(row => `
                     <tr class="border-b border-slate-700">
-                        <td class="p-2">${row.test || ''}</td>
-                        <td class="p-2">${row.input || ''}</td>
-                        <td class="p-2">${row.output || ''}</td>
-                    </tr>
-                `).join('');
+                        <td class="p-2">${row.test || ''}</td><td class="p-2">${row.input || ''}</td><td class="p-2">${row.output || ''}</td>
+                    </tr>`).join('');
 
                 const challengeElement = document.createElement('div');
-                challengeElement.className = `bg-slate-800 rounded-lg shadow-xl overflow-hidden`;
+                challengeElement.className = `bg-slate-800 rounded-lg shadow-xl overflow-hidden relative`;
+                challengeElement.id = `challenge-${challenge.id}`;
                 challengeElement.innerHTML = `
+                    <button class="delete-challenge-btn absolute top-3 right-3 text-slate-400 hover:text-red-500 transition-colors" title="Delete Challenge">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
                     <div class="p-6">
-                        <h2 class="text-2xl font-bold text-white mb-4">${challenge.title}</h2>
+                        <h2 class="text-2xl font-bold text-white mb-4 pr-8">${challenge.title}</h2>
                         <p class="text-slate-300 whitespace-pre-wrap mb-6">${challenge.description}</p>
-                        
                         <div class="mb-6">
                             <h3 class="font-semibold text-lg text-white mb-2">Expected Screen Output</h3>
                             <pre class="bg-slate-900 rounded-md p-4 font-mono text-sm text-green-300">${challenge.screenOutput || 'N/A'}</pre>
                         </div>
-
                         ${challenge.testingTable.length > 0 ? `
                         <div class="mb-6">
                             <h3 class="font-semibold text-lg text-white mb-2">Testing Table</h3>
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-sm text-left text-slate-300 bg-slate-700 rounded-md">
-                                    <thead class="bg-slate-600 text-xs uppercase">
-                                        <tr>
-                                            <th class="p-2">Test</th>
-                                            <th class="p-2">Input</th>
-                                            <th class="p-2">Output</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>${testingTableRows}</tbody>
-                                </table>
-                            </div>
+                            <div class="overflow-x-auto"><table class="w-full text-sm text-left text-slate-300 bg-slate-700 rounded-md">
+                                <thead class="bg-slate-600 text-xs uppercase"><tr><th class="p-2">Test</th><th class="p-2">Input</th><th class="p-2">Output</th></tr></thead>
+                                <tbody>${testingTableRows}</tbody>
+                            </table></div>
                         </div>` : ''}
-
                         <div>
                             <h3 class="font-semibold text-lg text-white mb-2">Solution</h3>
                             <div class="solution-container" id="solution-${index}">
-                                <div class="password-gate">
-                                    <input type="password" placeholder="Enter password to view" class="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg p-2 mr-2">
+                                <div class="password-gate flex items-center gap-2">
+                                    <input type="password" placeholder="Enter password to view" class="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg p-2 w-full max-w-xs">
                                     <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-sm">Show</button>
                                 </div>
-                                <pre class="solution-code bg-slate-900 rounded-md p-4 font-mono text-sm text-cyan-300 hidden"></pre>
+                                <pre class="solution-code bg-slate-900 rounded-md p-4 font-mono text-sm text-cyan-300 hidden mt-2"></pre>
                             </div>
                         </div>
-                    </div>
-                `;
+                    </div>`;
                 container.appendChild(challengeElement);
-
-                // Add event listener for the password button
-                const button = challengeElement.querySelector('button');
-                const passwordInput = challengeElement.querySelector('input[type="password"]');
-                const solutionCode = challengeElement.querySelector('.solution-code');
-                const passwordGate = challengeElement.querySelector('.password-gate');
                 
-                button.addEventListener('click', () => {
+                challengeElement.querySelector('.delete-challenge-btn').addEventListener('click', () => openDeleteModal(challenge.id));
+
+                const solutionContainer = challengeElement.querySelector(`#solution-${index}`);
+                solutionContainer.querySelector('button').addEventListener('click', () => {
+                    const passwordInput = solutionContainer.querySelector('input[type="password"]');
                     if (passwordInput.value === '90210') {
+                        const solutionCode = solutionContainer.querySelector('.solution-code');
                         solutionCode.textContent = challenge.solution || 'No solution provided.';
                         solutionCode.classList.remove('hidden');
-                        passwordGate.classList.add('hidden');
+                        solutionContainer.querySelector('.password-gate').classList.add('hidden');
                     } else {
-                        alert('Incorrect password.');
+                        passwordInput.value = '';
+                        passwordInput.placeholder = 'Incorrect password!';
                     }
                 });
             });
         }
 
-
         async function main() {
             const topic = getTopicFromURL();
             applyTheme(topic);
-
             try {
                  const app = initializeApp(firebaseConfig);
-                 const db = getFirestore(app);
+                 db = getFirestore(app);
                  const auth = getAuth(app);
                  await signInAnonymously(auth);
 
-                 const challengesCol = collection(db, 'challenges');
-                 const q = query(challengesCol, where("topic", "==", topic), orderBy("createdAt", "desc"));
+                 const q = query(collection(db, 'challenges'), where("topic", "==", topic), orderBy("createdAt", "desc"));
                  const querySnapshot = await getDocs(q);
-                 
-                 const challenges = [];
-                 querySnapshot.forEach((doc) => {
-                     challenges.push({ id: doc.id, ...doc.data() });
-                 });
-                 
+                 const challenges = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                  renderChallenges(challenges);
-
             } catch (error) {
                 console.error("Error fetching challenges:", error);
-                document.getElementById('challenges-container').innerHTML = `<p class="text-center text-red-400">Could not load challenges. Please check the console for errors.</p>`;
+                document.getElementById('challenges-container').innerHTML = `<p class="text-center text-red-400">Could not load challenges.</p>`;
             }
         }
-
+        
+        deleteForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            handleDeleteChallenge();
+        });
+        cancelDeleteBtn.addEventListener('click', closeDeleteModal);
         document.addEventListener('DOMContentLoaded', main);
     </script>
 </body>
