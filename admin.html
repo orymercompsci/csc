@@ -80,6 +80,10 @@
                     <label for="solution" class="block mb-2 text-sm font-medium text-slate-300">Solution Code</label>
                     <textarea id="solution" name="solution" rows="6" class="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 font-mono" placeholder="Enter the solution code here."></textarea>
                 </div>
+                <div>
+                    <label for="commands-used" class="block mb-2 text-sm font-medium text-slate-300">Commands Used</label>
+                    <textarea id="commands-used" name="commandsUsed" rows="3" class="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 font-mono" placeholder="e.g., print(), input(), len()"></textarea>
+                </div>
                 <div class="flex items-center justify-between pt-4">
                     <a href="index.html" class="text-sm text-slate-400 hover:text-white transition">&larr; Back to Home</a>
                     <button type="submit" id="submit-btn" class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-800 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center transition-colors">
@@ -98,7 +102,7 @@
         projectId: "cs-challenges-website",
         storageBucket: "cs-challenges-website.firebasestorage.app",
         messagingSenderId: "1062820761218",
-        appId: "1:1062820761218:web:ab4382d3f981d3f586ee9b"
+        appId: "1:1062820761218:web:ab4382d3f981df586ee9b"
       };
     </script>
 
@@ -185,9 +189,14 @@
                 if (test || input || output) testingTable.push({ test, input, output });
             }
             const challengeData = {
-                topic: formData.get('topic'), title: formData.get('title'),
-                description: formData.get('description'), screenOutput: formData.get('screenOutput'),
-                solution: formData.get('solution'), testingTable: testingTable,
+                topic: formData.get('topic'),
+                title: formData.get('title'),
+                description: formData.get('description'),
+                screenOutput: formData.get('screenOutput'),
+                solution: formData.get('solution'),
+                commandsUsed: formData.get('commandsUsed'),
+                rank: 0, // All new challenges start with a rank of 0
+                testingTable: testingTable,
                 createdAt: serverTimestamp()
             };
             try {
