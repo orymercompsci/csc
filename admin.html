@@ -13,8 +13,21 @@
     </style>
 </head>
 <body class="bg-slate-900 text-gray-200 min-h-screen py-12">
+    <!-- Password Overlay -->
+    <div id="password-overlay" class="fixed inset-0 bg-slate-900 bg-opacity-95 flex items-center justify-center z-50">
+        <div class="bg-slate-800 p-8 rounded-lg shadow-xl text-center w-full max-w-sm">
+            <h2 class="text-2xl font-bold text-white mb-4">Admin Access Required</h2>
+            <p class="text-slate-400 mb-6">Please enter the password to continue.</p>
+            <form id="password-form" class="flex flex-col gap-4">
+                <input type="password" id="password-input" class="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg p-2.5 text-center" placeholder="Password" required>
+                <button type="submit" class="text-white bg-blue-600 hover:bg-blue-700 font-medium rounded-lg text-sm px-5 py-2.5">Unlock</button>
+                <p id="password-error" class="text-red-400 text-sm mt-2 h-4"></p>
+            </form>
+        </div>
+    </div>
 
-    <div class="w-full max-w-4xl mx-auto p-4">
+    <!-- Main Content -->
+    <div id="main-content" class="w-full max-w-4xl mx-auto p-4 transition-all duration-300 filter blur-sm">
         <div class="bg-slate-800 rounded-lg shadow-xl p-8">
             <div class="text-center mb-8">
                 <h1 class="text-3xl font-bold text-white">Add a New Challenge</h1>
@@ -22,7 +35,7 @@
             </div>
 
             <form id="add-challenge-form" class="space-y-6">
-                <!-- Row 1: Topic and Title -->
+                <!-- Form content from previous version -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label for="topic-select" class="block mb-2 text-sm font-medium text-slate-300">Topic</label>
@@ -41,51 +54,32 @@
                         <input type="text" id="challenge-title" name="title" class="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="e.g., 'Sum of Two Numbers'" required>
                     </div>
                 </div>
-
-                <!-- Challenge Description -->
                 <div>
                     <label for="challenge-description" class="block mb-2 text-sm font-medium text-slate-300">Challenge Description</label>
                     <textarea id="challenge-description" name="description" rows="4" class="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Describe the challenge. You can use line breaks." required></textarea>
                 </div>
-                
-                <!-- Screen Output -->
                 <div>
                     <label for="screen-output" class="block mb-2 text-sm font-medium text-slate-300">Expected Screen Output</label>
                     <textarea id="screen-output" name="screenOutput" rows="4" class="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 font-mono text-sm" placeholder="Show what the console output should look like."></textarea>
                 </div>
-
-                <!-- Testing Table -->
                 <fieldset class="border border-slate-600 p-4 rounded-lg">
                     <legend class="text-sm font-medium text-slate-300 px-2">Testing Table</legend>
                     <div class="space-y-4">
-                        <!-- Test Row 1 -->
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <input type="text" name="test-1" class="bg-slate-700 border-slate-600 text-sm rounded-lg p-2" placeholder="Test 1">
-                            <input type="text" name="input-1" class="bg-slate-700 border-slate-600 text-sm rounded-lg p-2" placeholder="Input 1">
-                            <input type="text" name="output-1" class="bg-slate-700 border-slate-600 text-sm rounded-lg p-2" placeholder="Output 1">
+                            <input type="text" name="test-1" class="bg-slate-700 border-slate-600 text-sm rounded-lg p-2" placeholder="Test 1"><input type="text" name="input-1" class="bg-slate-700 border-slate-600 text-sm rounded-lg p-2" placeholder="Input 1"><input type="text" name="output-1" class="bg-slate-700 border-slate-600 text-sm rounded-lg p-2" placeholder="Output 1">
                         </div>
-                        <!-- Test Row 2 -->
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <input type="text" name="test-2" class="bg-slate-700 border-slate-600 text-sm rounded-lg p-2" placeholder="Test 2">
-                            <input type="text" name="input-2" class="bg-slate-700 border-slate-600 text-sm rounded-lg p-2" placeholder="Input 2">
-                            <input type="text" name="output-2" class="bg-slate-700 border-slate-600 text-sm rounded-lg p-2" placeholder="Output 2">
+                            <input type="text" name="test-2" class="bg-slate-700 border-slate-600 text-sm rounded-lg p-2" placeholder="Test 2"><input type="text" name="input-2" class="bg-slate-700 border-slate-600 text-sm rounded-lg p-2" placeholder="Input 2"><input type="text" name="output-2" class="bg-slate-700 border-slate-600 text-sm rounded-lg p-2" placeholder="Output 2">
                         </div>
-                        <!-- Test Row 3 -->
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                           <input type="text" name="test-3" class="bg-slate-700 border-slate-600 text-sm rounded-lg p-2" placeholder="Test 3">
-                           <input type="text" name="input-3" class="bg-slate-700 border-slate-600 text-sm rounded-lg p-2" placeholder="Input 3">
-                           <input type="text" name="output-3" class="bg-slate-700 border-slate-600 text-sm rounded-lg p-2" placeholder="Output 3">
+                           <input type="text" name="test-3" class="bg-slate-700 border-slate-600 text-sm rounded-lg p-2" placeholder="Test 3"><input type="text" name="input-3" class="bg-slate-700 border-slate-600 text-sm rounded-lg p-2" placeholder="Input 3"><input type="text" name="output-3" class="bg-slate-700 border-slate-600 text-sm rounded-lg p-2" placeholder="Output 3">
                         </div>
                     </div>
                 </fieldset>
-                
-                <!-- Solution -->
                  <div>
                     <label for="solution" class="block mb-2 text-sm font-medium text-slate-300">Solution Code</label>
                     <textarea id="solution" name="solution" rows="6" class="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 font-mono" placeholder="Enter the solution code here."></textarea>
                 </div>
-
-
                 <div class="flex items-center justify-between pt-4">
                     <a href="index.html" class="text-sm text-slate-400 hover:text-white transition">&larr; Back to Home</a>
                     <button type="submit" id="submit-btn" class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-800 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center transition-colors">
@@ -93,13 +87,10 @@
                     </button>
                 </div>
             </form>
-            
             <div id="status-message" class="mt-6 text-center text-sm font-medium"></div>
-
         </div>
     </div>
     
-    <!-- Your web app's Firebase configuration -->
     <script>
       const firebaseConfig = {
         apiKey: "AIzaSyDWfJRQhNUgktjIQaFVsoAqhsZtUQD3fpQ",
@@ -117,90 +108,96 @@
         import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         let db, auth;
+        let isPasswordCorrect = false;
+
         const form = document.getElementById('add-challenge-form');
         const submitBtn = document.getElementById('submit-btn');
         const statusMessage = document.getElementById('status-message');
+        
+        const passwordOverlay = document.getElementById('password-overlay');
+        const passwordForm = document.getElementById('password-form');
+        const passwordInput = document.getElementById('password-input');
+        const passwordError = document.getElementById('password-error');
+        const mainContent = document.getElementById('main-content');
 
         function updateStatus(message, type = 'success') {
             statusMessage.textContent = message;
             statusMessage.className = `mt-6 text-center text-sm font-medium ${type === 'success' ? 'text-green-400' : 'text-red-400'}`;
         }
+        
+        function setupPasswordProtection() {
+            passwordForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                passwordError.textContent = '';
+                if (passwordInput.value === 'Nintendo1') {
+                    isPasswordCorrect = true;
+                    passwordOverlay.classList.add('hidden');
+                    mainContent.classList.remove('blur-sm');
+                    if (auth && auth.currentUser) {
+                        submitBtn.disabled = false;
+                    }
+                } else {
+                    passwordError.textContent = 'Incorrect password. Please try again.';
+                    passwordInput.value = '';
+                    passwordInput.focus();
+                }
+            });
+        }
 
         async function initializeFirebase() {
             try {
-                if (typeof firebaseConfig === 'undefined' || !firebaseConfig.projectId) {
-                    throw new Error("Firebase config object is missing or invalid.");
-                }
-
                 const app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
                 auth = getAuth(app);
                 await authenticate();
             } catch (e) {
                 console.error("Firebase initialization failed:", e);
-                updateStatus("Could not connect to the database. Check your Firebase config.", "error");
-                submitBtn.disabled = true;
+                updateStatus("Could not connect to the database. Check config.", "error");
             }
         }
 
         async function authenticate() {
             try {
                 await signInAnonymously(auth);
+                if (isPasswordCorrect) submitBtn.disabled = false;
             } catch (error) {
                 console.error("Authentication failed:", error);
                 if (error.code === 'auth/configuration-not-found') {
-                    updateStatus("Authentication failed: 'Anonymous' sign-in is not enabled in your Firebase project. Please enable it in the Firebase Console.", "error");
+                    updateStatus("Authentication failed: 'Anonymous' sign-in is not enabled in your Firebase project.", "error");
                 } else {
-                    updateStatus("Authentication failed. Cannot add challenges.", "error");
+                    updateStatus("Authentication failed.", "error");
                 }
-                submitBtn.disabled = true;
             }
         }
         
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
             if (!db || !auth.currentUser) {
-                updateStatus('Database not ready. Please wait and try again.', 'error');
+                updateStatus('Database not ready. Try again.', 'error');
                 return;
             }
-
             submitBtn.disabled = true;
             submitBtn.textContent = 'Adding...';
-
             const formData = new FormData(form);
-            
             const testingTable = [];
             for (let i = 1; i <= 3; i++) {
-                const test = formData.get(`test-${i}`);
-                const input = formData.get(`input-${i}`);
-                const output = formData.get(`output-${i}`);
-                if (test || input || output) {
-                    testingTable.push({ test, input, output });
-                }
+                const test = formData.get(`test-${i}`), input = formData.get(`input-${i}`), output = formData.get(`output-${i}`);
+                if (test || input || output) testingTable.push({ test, input, output });
             }
-
             const challengeData = {
-                topic: formData.get('topic'),
-                title: formData.get('title'),
-                description: formData.get('description'),
-                screenOutput: formData.get('screenOutput'),
-                solution: formData.get('solution'),
-                testingTable: testingTable,
+                topic: formData.get('topic'), title: formData.get('title'),
+                description: formData.get('description'), screenOutput: formData.get('screenOutput'),
+                solution: formData.get('solution'), testingTable: testingTable,
                 createdAt: serverTimestamp()
             };
-
             try {
-                const challengesCollectionPath = `challenges`;
-                await addDoc(collection(db, challengesCollectionPath), challengeData);
-                
+                await addDoc(collection(db, `challenges`), challengeData);
                 updateStatus('Challenge added successfully!', 'success');
                 form.reset();
                 setTimeout(() => updateStatus(''), 3000);
-
             } catch (error) {
                 console.error("Error adding document: ", error);
-                updateStatus('Failed to add challenge. See console for details.', 'error');
+                updateStatus('Failed to add challenge.', 'error');
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Add Challenge';
@@ -208,6 +205,8 @@
         });
 
         document.addEventListener('DOMContentLoaded', () => {
+             submitBtn.disabled = true;
+             setupPasswordProtection();
              initializeFirebase();
         });
     </script>
