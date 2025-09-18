@@ -78,7 +78,7 @@
         let challengeToEditId = null;
         let challengeToDeleteId = null;
         let rankChangeData = {};
-        let currentThemeColorClass = 'text-gray-900'; // ADDED: Default theme color
+        let currentThemeColorClass = 'text-gray-900';
 
         const challengesContainer = document.getElementById('challenges-container');
         
@@ -219,10 +219,9 @@
 
         function getTopicFromURL() { return new URLSearchParams(window.location.search).get('topic') || 'default'; }
         
-        // UPDATED: This function now sets the global theme color class
         function applyTheme(topic) { 
             const style = TOPIC_STYLES[topic] || TOPIC_STYLES.default;
-            currentThemeColorClass = `text-${style.color}-600`; // Use a slightly darker shade for contrast
+            currentThemeColorClass = `text-${style.color}-600`;
             document.getElementById('topic-title').textContent = style.name; 
             document.getElementById('page-header').classList.add(`border-${style.color}-500`); 
             document.body.className = document.body.className.replace(/bg-gray-100/g, `bg-${style.color}-50`); 
@@ -241,15 +240,8 @@
             challenges.forEach((challenge, index) => {
                 const commandTags = (challenge.commandsUsed || '').split(',').map(cmd => cmd.trim().toLowerCase()).filter(Boolean).map(cmdKey => {
                     const commandInfo = COMMAND_DATA[cmdKey.replace(/\(\)/g, '')] || COMMAND_DATA[cmdKey];
-                    // FIXED: Replaced default title tooltip with a custom, styled one that correctly preserves whitespace.
-                    return commandInfo ? `
-                        <span class="relative group font-semibold cursor-pointer" style="color: ${commandInfo.color};">
-                            ${commandInfo.name}
-                            <span class="absolute hidden group-hover:block bottom-full mb-2 left-1/2 -translate-x-1/2 w-max max-w-xs bg-gray-800 text-white text-xs rounded-lg p-3 z-10 whitespace-pre-wrap shadow-lg text-left font-mono">
-                                ${escapeHTML(commandInfo.example.trim())}
-                            </span>
-                        </span>
-                    ` : `<span>${cmdKey}</span>`;
+                    // REMOVED Tooltips from command tags
+                    return commandInfo ? `<span class="font-semibold" style="color: ${commandInfo.color};">${commandInfo.name}</span>` : `<span>${cmdKey}</span>`;
                 }).join(', ');
 
                 const challengeElement = document.createElement('div');
@@ -262,7 +254,6 @@
                     </div>
                     <div class="absolute top-4 left-4 flex flex-col items-center"><button class="rank-btn" data-id="${challenge.id}" data-rank="${challenge.rank || 0}" data-change="1" title="Increase Rank"><svg class="w-6 h-6 text-gray-400 hover:text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg></button><span class="font-bold text-xl text-gray-800" title="Current Rank">${challenge.rank || 0}</span><button class="rank-btn" data-id="${challenge.id}" data-rank="${challenge.rank || 0}" data-change="-1" title="Decrease Rank"><svg class="w-6 h-6 text-gray-400 hover:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button></div>
                     <div class="p-6 pl-20 pr-12">
-                        <!-- UPDATED: Added the theme color class to the h2 element -->
                         <h2 class="text-2xl font-bold mb-1 ${currentThemeColorClass}">${challenge.title}</h2>
                         ${commandTags ? `<div class="text-xs text-gray-500 mb-4">Commands Used: ${commandTags}</div>` : ''}
                         <div class="text-gray-700 mb-6 description-content">${challenge.description}</div>
