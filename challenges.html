@@ -10,6 +10,12 @@
         body { font-family: 'Poppins', sans-serif; transition: background-color 0.5s ease; }
         pre { white-space: pre-wrap; word-wrap: break-word; }
         .help-code-example { font-family: 'Courier New', Courier, monospace; }
+        /* Styles for rich text content */
+        .description-content ul, .description-content ol { margin-left: 1.5rem; margin-bottom: 1rem; }
+        .description-content li { margin-bottom: 0.25rem; }
+        .description-content p { margin-bottom: 0.5rem; }
+        .description-content strong { font-weight: bold; }
+        .description-content em { font-style: italic; }
     </style>
 </head>
 <body class="bg-slate-900 text-gray-200 min-h-screen">
@@ -304,7 +310,10 @@
                     <div class="p-6 pl-20 pr-12">
                         <h2 class="text-2xl font-bold text-white mb-1">${challenge.title}</h2>
                         ${commandTags ? `<div class="text-xs text-slate-400 mb-4">Commands Used: ${commandTags}</div>` : ''}
-                        <p class="text-slate-300 whitespace-pre-wrap mb-6">${challenge.description}</p>
+                        
+                        <!-- FIXED: Use a div to render HTML content correctly -->
+                        <div class="text-slate-300 mb-6 description-content">${challenge.description}</div>
+                        
                         <div class="mb-6"><h3 class="font-semibold text-lg text-white mb-2">Expected Screen Output</h3><pre class="bg-slate-900 rounded-md p-4 font-mono text-sm text-green-300">${challenge.screenOutput || 'N/A'}</pre></div>
                         ${testingTableRows ? `<div class="mb-6"><h3 class="font-semibold text-lg text-white mb-2">Testing Table</h3><div class="overflow-x-auto"><table class="w-full text-sm text-left text-slate-300 bg-slate-700 rounded-md"><thead class="bg-slate-600 text-xs uppercase"><tr><th class="p-2">Test</th><th class="p-2">Input</th><th class="p-2">Output</th></tr></thead><tbody>${testingTableRows}</tbody></table></div></div>` : ''}
                         <div>
