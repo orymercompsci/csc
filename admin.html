@@ -6,73 +6,59 @@
     <title>Admin Panel</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-    <!-- Include Quill's CSS -->
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     <style> 
         body { font-family: 'Poppins', sans-serif; } 
-        /* Style Quill editor to fit the dark theme */
-        .ql-toolbar { border-radius: 0.5rem 0.5rem 0 0; border-color: #4A5568 !important; }
-        .ql-container { border-radius: 0 0 0.5rem 0.5rem; border-color: #4A5568 !important; height: 150px; }
-        .ql-editor { color: #1a202c; }
-        .ql-snow .ql-stroke { stroke: #CBD5E0; }
-        .ql-snow .ql-fill { fill: #CBD5E0; }
-        .ql-snow .ql-picker-label { color: #CBD5E0 !important; }
+        .ql-toolbar { border-color: #d1d5db !important; border-top-left-radius: 0.5rem; border-top-right-radius: 0.5rem; }
+        .ql-container { border-color: #d1d5db !important; border-bottom-left-radius: 0.5rem; border-bottom-right-radius: 0.5rem; }
+        .ql-editor { min-height: 120px; color: #111827; }
+        .ql-snow .ql-stroke { stroke: #374151; }
     </style>
 </head>
-<body class="bg-slate-900 text-gray-200 min-h-screen py-12">
-    <div id="password-overlay" class="fixed inset-0 bg-slate-900 bg-opacity-95 flex items-center justify-center z-50">
-        <div class="bg-slate-800 p-8 rounded-lg shadow-xl text-center w-full max-w-sm"><h2 class="text-2xl font-bold text-white mb-4">Admin Access Required</h2><p class="text-slate-400 mb-6 text-base">Please enter the password to continue.</p><form id="password-form" class="flex flex-col gap-4"><input type="password" id="password-input" class="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg p-2.5 text-center" placeholder="Password" required><button type="submit" class="text-white bg-blue-600 hover:bg-blue-700 font-medium rounded-lg text-sm px-5 py-2.5">Unlock</button><p id="password-error" class="text-red-400 text-sm mt-2 h-4"></p></form></div>
+<body class="bg-gray-100 text-gray-800 min-h-screen py-12">
+    <div id="password-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-lg shadow-xl text-center w-full max-w-sm"><h2 class="text-2xl font-bold text-gray-900 mb-4">Admin Access Required</h2><p class="text-gray-600 mb-6 text-base">Please enter the password to continue.</p><form id="password-form" class="flex flex-col gap-4"><input type="password" id="password-input" class="bg-gray-200 border border-gray-400 text-gray-900 text-sm rounded-lg p-2.5 text-center" placeholder="Password" required><button type="submit" class="text-white bg-blue-600 hover:bg-blue-700 font-medium rounded-lg text-sm px-5 py-2.5">Unlock</button><p id="password-error" class="text-red-500 text-sm mt-2 h-4"></p></form></div>
     </div>
     <div id="main-content" class="w-full max-w-4xl mx-auto p-4 transition-all duration-300 filter blur-sm">
-        <div class="bg-slate-800 rounded-lg shadow-xl p-8">
-            <div class="text-center mb-8"><h1 class="text-3xl font-bold text-white">Add a New Challenge</h1><p class="text-slate-400 text-base">Fill out the form below to add a new programming challenge.</p></div>
+        <div class="bg-white rounded-lg shadow-lg p-8">
+            <div class="text-center mb-8"><h1 class="text-3xl font-bold text-gray-900">Add a New Challenge</h1><p class="text-gray-600 text-base">Fill out the form below to add a new programming challenge.</p></div>
             <form id="add-challenge-form" class="space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div><label for="topic-select" class="block mb-2 text-sm font-medium text-slate-300">Topic</label><select id="topic-select" name="topic" class="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required><option value="sequence">Sequence</option><option value="selection">Selection</option><option value="iteration">Iteration</option><option value="data-structures">Data Structures</option><option value="file-handling">File Handling</option><option value="subprograms">Subprograms</option><option value="exam-questions">Exam Questions</option></select></div>
-                    <div><label for="challenge-title" class="block mb-2 text-sm font-medium text-slate-300">Challenge Title</label><input type="text" id="challenge-title" name="title" class="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="e.g., 'Sum of Two Numbers'" required></div>
+                    <div><label for="topic-select" class="block mb-2 text-sm font-medium text-gray-700">Topic</label><select id="topic-select" name="topic" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required><option value="sequence">Sequence</option><option value="selection">Selection</option><option value="iteration">Iteration</option><option value="data-structures">Data Structures</option><option value="file-handling">File Handling</option><option value="subprograms">Subprograms</option><option value="exam-questions">Exam Questions</option></select></div>
+                    <div><label for="challenge-title" class="block mb-2 text-sm font-medium text-gray-700">Challenge Title</label><input type="text" id="challenge-title" name="title" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="e.g., 'Sum of Two Numbers'" required></div>
                 </div>
+                <div><label for="challenge-description" class="block mb-2 text-sm font-medium text-gray-700">Challenge Description</label><div id="description-editor" class="bg-white"></div></div>
                 
-                <!-- Rich Text Editor for Challenge Description -->
                 <div>
-                    <label class="block mb-2 text-sm font-medium text-slate-300">Challenge Description</label>
-                    <div id="description-editor" class="bg-white rounded-lg"></div>
-                    <textarea id="challenge-description" name="description" class="hidden"></textarea>
-                </div>
-                
-                <!-- Commands Used Checkboxes -->
-                <div>
-                    <label class="block mb-2 text-sm font-medium text-slate-300">Commands Used</label>
-                    <div id="commands-checkboxes" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 bg-slate-700 p-4 rounded-lg max-h-48 overflow-y-auto">
+                    <label class="block mb-2 text-sm font-medium text-gray-700">Commands Used</label>
+                    <div id="commands-checkboxes" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 bg-gray-50 border border-gray-300 p-4 rounded-lg max-h-48 overflow-y-auto">
                         <!-- Checkboxes will be inserted here by JavaScript -->
                     </div>
                 </div>
 
-                <div><label for="screen-output" class="block mb-2 text-sm font-medium text-slate-300">Expected Screen Output</label><textarea id="screen-output" name="screenOutput" rows="4" class="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 font-mono" placeholder="Show what the console output should look like."></textarea></div>
-                <fieldset class="border border-slate-600 p-4 rounded-lg">
-                    <legend class="text-sm font-medium text-slate-300 px-2">Testing Table</legend>
+                <div><label for="screen-output" class="block mb-2 text-sm font-medium text-gray-700">Expected Screen Output</label><textarea id="screen-output" name="screenOutput" rows="4" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 font-mono" placeholder="Show what the console output should look like."></textarea></div>
+                <fieldset class="border border-gray-300 p-4 rounded-lg">
+                    <legend class="text-sm font-medium text-gray-700 px-2">Testing Table</legend>
                     <div class="space-y-4">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4"><input type="text" name="test-1" class="bg-slate-700 border-slate-600 text-sm rounded-lg p-2" placeholder="Test 1"><input type="text" name="input-1" class="bg-slate-700 border-slate-600 text-sm rounded-lg p-2" placeholder="Input 1"><input type="text" name="output-1" class="bg-slate-700 border-slate-600 text-sm rounded-lg p-2" placeholder="Output 1"></div>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4"><input type="text" name="test-2" class="bg-slate-700 border-slate-600 text-sm rounded-lg p-2" placeholder="Test 2"><input type="text" name="input-2" class="bg-slate-700 border-slate-600 text-sm rounded-lg p-2" placeholder="Input 2"><input type="text" name="output-2" class="bg-slate-700 border-slate-600 text-sm rounded-lg p-2" placeholder="Output 2"></div>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4"><input type="text" name="test-3" class="bg-slate-700 border-slate-600 text-sm rounded-lg p-2" placeholder="Test 3"><input type="text" name="input-3" class="bg-slate-700 border-slate-600 text-sm rounded-lg p-2" placeholder="Input 3"><input type="text" name="output-3" class="bg-slate-700 border-slate-600 text-sm rounded-lg p-2" placeholder="Output 3"></div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4"><input type="text" name="test-1" class="bg-gray-50 border-gray-300 text-sm rounded-lg p-2" placeholder="Test 1"><input type="text" name="input-1" class="bg-gray-50 border-gray-300 text-sm rounded-lg p-2" placeholder="Input 1"><input type="text" name="output-1" class="bg-gray-50 border-gray-300 text-sm rounded-lg p-2" placeholder="Output 1"></div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4"><input type="text" name="test-2" class="bg-gray-50 border-gray-300 text-sm rounded-lg p-2" placeholder="Test 2"><input type="text" name="input-2" class="bg-gray-50 border-gray-300 text-sm rounded-lg p-2" placeholder="Input 2"><input type="text" name="output-2" class="bg-gray-50 border-gray-300 text-sm rounded-lg p-2" placeholder="Output 2"></div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4"><input type="text" name="test-3" class="bg-gray-50 border-gray-300 text-sm rounded-lg p-2" placeholder="Test 3"><input type="text" name="input-3" class="bg-gray-50 border-gray-300 text-sm rounded-lg p-2" placeholder="Input 3"><input type="text" name="output-3" class="bg-gray-50 border-gray-300 text-sm rounded-lg p-2" placeholder="Output 3"></div>
                     </div>
                 </fieldset>
-                <div><label for="solution" class="block mb-2 text-sm font-medium text-slate-300">Solution Code</label><textarea id="solution" name="solution" rows="6" class="bg-slate-700 border border-slate-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 font-mono" placeholder="Enter the solution code here."></textarea></div>
-                <div class="flex items-center justify-between pt-4"><a href="index.html" class="text-sm text-slate-400 hover:text-white transition">&larr; Back to Home</a><button type="submit" id="submit-btn" class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-800 font-medium rounded-lg text-sm w-full sm-w-auto px-5 py-2.5 text-center transition-colors">Add Challenge</button></div>
+                <div><label for="solution" class="block mb-2 text-sm font-medium text-gray-700">Solution Code</label><textarea id="solution" name="solution" rows="6" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 font-mono" placeholder="Enter the solution code here."></textarea></div>
+                <div class="flex items-center justify-between pt-4"><a href="index.html" class="text-sm text-gray-500 hover:text-gray-800 transition">&larr; Back to Home</a><button type="submit" id="submit-btn" class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center transition-colors">Add Challenge</button></div>
             </form>
             <div id="status-message" class="mt-6 text-center text-sm font-medium"></div>
         </div>
     </div>
-    <script>const firebaseConfig = { apiKey: "AIzaSyDWfJRQhNUgktjIQaFVsoAqhsZtUQD3fpQ", authDomain: "cs-challenges-website.firebaseapp.com", projectId: "cs-challenges-website", storageBucket: "cs-challenges-website.firebasestorage.app", messagingSenderId: "1062820761218", appId: "1:1062820761218:web:ab4382d3f981d3f586ee9b" };</script>
-    
-    <!-- Include Quill's JavaScript -->
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
-
+    <script>const firebaseConfig = { apiKey: "AIzaSyDWfJRQhNUgktjIQaFVsoAqhsZtUQD3fpQ", authDomain: "cs-challenges-website.firebaseapp.com", projectId: "cs-challenges-website", storageBucket: "cs-challenges-website.firebasestorage.app", messagingSenderId: "1062820761218", appId: "1:1062820761218:web:ab4382d3f981d3f586ee9b" };</script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"; 
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"; 
         import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
         
-        let db, auth, isPasswordCorrect = false, quill, isSubmitting = false; 
+        let db, auth, isPasswordCorrect = false, isSubmitting = false; 
         const form = document.getElementById("add-challenge-form");
         const submitBtn = document.getElementById("submit-btn");
         const statusMessage = document.getElementById("status-message");
@@ -82,6 +68,11 @@
         const passwordError = document.getElementById("password-error");
         const mainContent = document.getElementById("main-content");
         
+        const quill = new Quill('#description-editor', {
+            theme: 'snow',
+            modules: { toolbar: [ ['bold', 'italic'], [{ 'list': 'ordered'}, { 'list': 'bullet' }], [{ 'indent': '-1'}, { 'indent': '+1' }] ] }
+        });
+
         const COMMAND_DATA_TEXT = `
             print()
             #EF4444
@@ -212,26 +203,6 @@
             });
             return commandObject;
         }
-        
-        function initializeQuillEditor() {
-            quill = new Quill('#description-editor', {
-                modules: {
-                    toolbar: [
-                        [{ 'header': [1, 2, false] }],
-                        ['bold', 'italic', 'underline'],
-                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                        [{ 'indent': '-1'}, { 'indent': '+1' }]
-                    ]
-                },
-                placeholder: 'Describe the challenge...',
-                theme: 'snow'
-            });
-
-            const descriptionTextarea = document.getElementById('challenge-description');
-            quill.on('text-change', function() {
-                descriptionTextarea.value = quill.root.innerHTML;
-            });
-        }
 
         function populateCommandsCheckboxes() {
             const COMMAND_DATA = parseCommandData(COMMAND_DATA_TEXT);
@@ -242,8 +213,8 @@
                 const checkboxDiv = document.createElement('div');
                 checkboxDiv.className = 'flex items-center';
                 checkboxDiv.innerHTML = `
-                    <input id="cmd-${key}" type="checkbox" value="${command.name}" name="commands" class="w-4 h-4 text-blue-600 bg-slate-600 border-slate-500 rounded focus:ring-blue-500 focus:ring-2">
-                    <label for="cmd-${key}" class="ml-2 text-sm font-medium text-slate-300" style="color: ${command.color};">${command.name}</label>
+                    <input id="cmd-${key}" type="checkbox" value="${command.name}" name="commands" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                    <label for="cmd-${key}" class="ml-2 text-sm font-medium" style="color: ${command.color};">${command.name}</label>
                 `;
                 container.appendChild(checkboxDiv);
             }
@@ -251,7 +222,7 @@
 
         function updateStatus(message, type = "success") { 
             statusMessage.textContent = message;
-            statusMessage.className = `mt-6 text-center text-sm font-medium ${type === "success" ? "text-green-400" : "text-red-400"}`;
+            statusMessage.className = `mt-6 text-center text-sm font-medium ${type === "success" ? "text-green-600" : "text-red-600"}`;
         } 
 
         function setupPasswordProtection() { 
@@ -306,12 +277,11 @@
 
         form.addEventListener("submit", async e => { 
             e.preventDefault();
-            if (isSubmitting) return; // Prevent double submissions
-            if (!db || !auth.currentUser) {
-                updateStatus("Database not ready. Try again.", "error");
+            if (!db || !auth.currentUser || isSubmitting) {
+                if(isSubmitting) updateStatus('Submission in progress...', 'error');
+                else updateStatus("Database not ready. Try again.", "error");
                 return;
             }
-            
             isSubmitting = true;
             submitBtn.disabled = true;
             submitBtn.textContent = "Adding...";
@@ -330,13 +300,11 @@
                 selectedCommands.push(checkbox.value);
             });
             const commandsUsedString = selectedCommands.join(', ');
-            
-            const descriptionHTML = document.getElementById('challenge-description').value;
 
             const challengeData = { 
                 topic: formData.get("topic"), 
                 title: formData.get("title"), 
-                description: descriptionHTML, 
+                description: quill.root.innerHTML,
                 screenOutput: formData.get("screenOutput"), 
                 solution: formData.get("solution"), 
                 testingTable: testingTable, 
@@ -349,23 +317,22 @@
                 await addDoc(collection(db, "challenges"), challengeData);
                 updateStatus("Challenge added successfully!", "success");
                 form.reset();
-                quill.setText(''); // Clear the Quill editor
+                quill.setContents([]);
                 document.querySelectorAll('#commands-checkboxes input[type="checkbox"]').forEach(cb => cb.checked = false);
                 setTimeout(() => updateStatus(""), 3000);
             } catch (error) {
                 console.error("Error adding document: ", error);
                 updateStatus("Failed to add challenge.", "error");
             } finally {
-                isSubmitting = false;
                 submitBtn.disabled = false;
                 submitBtn.textContent = "Add Challenge";
+                isSubmitting = false;
             }
         }); 
 
         document.addEventListener("DOMContentLoaded", () => { 
             submitBtn.disabled = true;
             setupPasswordProtection();
-            initializeQuillEditor();
             populateCommandsCheckboxes();
             initializeFirebase();
         });
