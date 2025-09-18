@@ -58,7 +58,7 @@
         
         const TOPIC_STYLES = { 'sequence': { name: 'Sequence', color: 'red' }, 'selection': { name: 'Selection', color: 'orange' }, 'iteration': { name: 'Iteration', color: 'yellow' }, 'data-structures': { name: 'Data Structures', color: 'green' }, 'file-handling': { name: 'File Handling', color: 'blue' }, 'subprograms': { name: 'Subprograms', color: 'indigo' }, 'exam-questions': { name: 'Exam Questions', color: 'purple' }, 'default': { name: 'Challenges', color: 'slate' } };
         const COMMAND_DATA = {
-            'print': { color: 'text-green-400', example: 'print("Hello, World!")' },
+            'print': { color: 'text-red-400', example: 'print("Hello")' },
             'input': { color: 'text-cyan-400', example: 'name = input("Enter your name: ")\nprint("Hello, " + name)' },
             'if': { color: 'text-orange-400', example: 'age = 18\nif age >= 18:\n    print("You are an adult.")\nelse:\n    print("You are a minor.")' },
             'for': { color: 'text-purple-400', example: 'for i in range(5):\n    print(i)' },
@@ -120,7 +120,7 @@
                 challengeElement.id = `challenge-${challenge.id}`;
                 challengeElement.innerHTML = `
                     <div class="absolute top-4 right-4 flex gap-2">
-                         <button class="delete-challenge-btn text-slate-400 hover:text-red-500 transition-colors" title="Delete Challenge" data-id="${challenge.id}"><svg xmlns="http://www.w.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
+                         <button class="delete-challenge-btn text-slate-400 hover:text-red-500 transition-colors" title="Delete Challenge" data-id="${challenge.id}"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
                     </div>
                     <div class="absolute top-4 left-4 flex flex-col items-center"><button class="rank-btn" data-id="${challenge.id}" data-rank="${challenge.rank || 0}" data-change="1" title="Increase Rank"><svg class="w-6 h-6 text-slate-400 hover:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg></button><span class="font-bold text-lg text-white" title="Current Rank">${challenge.rank || 0}</span><button class="rank-btn" data-id="${challenge.id}" data-rank="${challenge.rank || 0}" data-change="-1" title="Decrease Rank"><svg class="w-6 h-6 text-slate-400 hover:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button></div>
                     <div class="p-6 pl-20 pr-12">
