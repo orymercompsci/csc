@@ -13,9 +13,14 @@
         
         /* Styles for rich text content in light mode */
         .description-content { color: #374151; }
-        .description-content ul, .description-content ol { margin-left: 1.5rem; margin-bottom: 1rem; list-style-position: outside; }
-        .description-content ul { list-style-type: disc; }
-        .description-content ol { list-style-type: decimal; }
+        .description-content ul, .description-content ol { 
+            margin-left: 1.5rem !important; 
+            margin-bottom: 1rem !important; 
+            list-style-position: outside !important;
+        }
+        .description-content ul { list-style-type: disc !important; }
+        .description-content ol { list-style-type: decimal !important; }
+
         .description-content li { margin-bottom: 0.5rem; color: #374151; }
         .description-content p { margin-bottom: 1rem; color: #374151; }
         .description-content strong { font-weight: bold; color: #111827; }
@@ -57,6 +62,15 @@
                 </div>
                 <div><label for="edit-description" class="block mb-2 text-sm font-medium text-gray-700">Challenge Description</label><div id="edit-description" class="bg-white"></div></div>
                 <div><label class="block mb-2 text-sm font-medium text-gray-700">Commands Used</label><div id="edit-commands-checkboxes" class="grid grid-cols-2 sm:grid-cols-4 gap-4 bg-gray-50 p-4 rounded-lg border border-gray-300"></div></div>
+                
+                <!-- ADDED: Testing Table in Edit Modal -->
+                <fieldset class="border border-gray-300 p-4 rounded-lg">
+                    <legend class="text-sm font-medium text-gray-700 px-2">Testing Table</legend>
+                    <div id="edit-testing-table" class="space-y-4">
+                        <!-- Rows will be injected by JS -->
+                    </div>
+                </fieldset>
+
                 <div><label for="edit-screen-output" class="block mb-2 text-sm font-medium text-gray-700">Expected Screen Output</label><textarea id="edit-screen-output" rows="3" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 font-mono"></textarea></div>
                 <div><label for="edit-solution" class="block mb-2 text-sm font-medium text-gray-700">Solution Code</label><textarea id="edit-solution" rows="4" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 font-mono"></textarea></div>
                 <div class="flex justify-end gap-4 pt-4"><button type="button" id="cancel-edit-btn" class="text-gray-800 bg-gray-200 hover:bg-gray-300 font-medium rounded-lg text-sm px-5 py-2.5">Cancel</button><button type="submit" class="text-white bg-blue-600 hover:bg-blue-700 font-medium rounded-lg text-sm px-5 py-2.5">Save Changes</button></div>
@@ -245,6 +259,32 @@
                     const commandInfo = COMMAND_DATA[cmdKey.replace(/\(\)/g, '')] || COMMAND_DATA[cmdKey];
                     return commandInfo ? `<span class="font-semibold" style="color: ${commandInfo.color};">${commandInfo.name}</span>` : `<span>${cmdKey}</span>`;
                 }).join(', ');
+                
+                // FIXED: Logic to build the testing table HTML
+                const testingTableRows = (challenge.testingTable || []).map(row => `
+                    <tr class="border-b border-gray-200">
+                        <td class="p-2">${escapeHTML(row.test || '')}</td>
+                        <td class="p-2">${escapeHTML(row.input || '')}</td>
+                        <td class="p-2">${escapeHTML(row.output || '')}</td>
+                    </tr>
+                `).join('');
+                
+                const testingTableHTML = testingTableRows ? `
+                    <div class="mb-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-2">Testing Table</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-left text-gray-700 bg-gray-100 rounded-md">
+                                <thead class="bg-gray-200 text-xs uppercase">
+                                    <tr>
+                                        <th class="p-2">Test</th>
+                                        <th class="p-2">Input</th>
+                                        <th class="p-2">Output</th>
+                                    </tr>
+                                </thead>
+                                <tbody>${testingTableRows}</tbody>
+                            </table>
+                        </div>
+                    </div>` : '';
 
                 const challengeElement = document.createElement('div');
                 challengeElement.className = `bg-white rounded-lg shadow-lg overflow-hidden relative`;
@@ -259,6 +299,7 @@
                         <h2 class="text-2xl font-bold mb-1 ${currentThemeColorClass}">${challenge.title}</h2>
                         ${commandTags ? `<div class="text-xs text-gray-500 mb-4">Commands Used: ${commandTags}</div>` : ''}
                         <div class="text-gray-700 mb-6 description-content">${challenge.description}</div>
+                        ${testingTableHTML}
                         <div class="mb-6"><h3 class="font-semibold text-lg text-gray-800 mb-2">Expected Screen Output</h3><pre class="bg-gray-200 text-gray-800 rounded-md p-4 font-mono text-sm">${challenge.screenOutput || 'N/A'}</pre></div>
                         <div><h3 class="font-semibold text-lg text-gray-800 mb-2">Solution</h3><div class="solution-container" id="solution-${index}"><div class="password-gate flex items-center gap-2"><input type="password" placeholder="Enter password to view" class="bg-gray-200 border border-gray-400 text-sm rounded-lg p-2 w-full max-w-xs"><button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-sm">Show</button></div><pre class="solution-code bg-gray-200 text-gray-800 rounded-md p-4 font-mono text-sm hidden mt-2"></pre></div></div>
                     </div>`;
@@ -290,11 +331,23 @@
             e.preventDefault();
             const challengeId = document.getElementById('edit-challenge-id').value;
             const selectedCommands = Array.from(document.querySelectorAll('#edit-commands-checkboxes input:checked')).map(cb => cb.value);
+            
+            const testingTable = [];
+            for (let i = 1; i <= 3; i++) {
+                const test = document.getElementById(`edit-test-${i}`).value;
+                const input = document.getElementById(`edit-input-${i}`).value;
+                const output = document.getElementById(`edit-output-${i}`).value;
+                if (test || input || output) {
+                    testingTable.push({ test, input, output });
+                }
+            }
+            
             const updatedData = { 
                 title: document.getElementById('edit-challenge-title').value,
                 rank: parseInt(document.getElementById('edit-challenge-rank').value, 10) || 0,
                 description: quillEdit.root.innerHTML, 
                 commandsUsed: selectedCommands.join(', '), 
+                testingTable: testingTable,
                 screenOutput: document.getElementById('edit-screen-output').value, 
                 solution: document.getElementById('edit-solution').value, 
             };
@@ -336,6 +389,22 @@
             document.getElementById('edit-screen-output').value = challenge.screenOutput || '';
             document.getElementById('edit-solution').value = challenge.solution || '';
             document.getElementById('edit-error').textContent = '';
+            
+            // Populate testing table in edit modal
+            const testingTableContainer = document.getElementById('edit-testing-table');
+            testingTableContainer.innerHTML = '';
+            for (let i = 1; i <= 3; i++) {
+                const rowData = (challenge.testingTable && challenge.testingTable[i-1]) ? challenge.testingTable[i-1] : {};
+                const row = document.createElement('div');
+                row.className = 'grid grid-cols-1 md:grid-cols-3 gap-4';
+                row.innerHTML = `
+                    <input type="text" id="edit-test-${i}" class="bg-gray-50 border-gray-300 text-sm rounded-lg p-2" placeholder="Test ${i}" value="${rowData.test || ''}">
+                    <input type="text" id="edit-input-${i}" class="bg-gray-50 border-gray-300 text-sm rounded-lg p-2" placeholder="Input ${i}" value="${rowData.input || ''}">
+                    <input type="text" id="edit-output-${i}" class="bg-gray-50 border-gray-300 text-sm rounded-lg p-2" placeholder="Output ${i}" value="${rowData.output || ''}">
+                `;
+                testingTableContainer.appendChild(row);
+            }
+
             const usedCommands = (challenge.commandsUsed || '').split(',').map(c => c.trim());
             document.querySelectorAll('#edit-commands-checkboxes input').forEach(cb => { cb.checked = usedCommands.includes(cb.value); });
             openModal(editModal);
@@ -345,7 +414,6 @@
             const editCommandsContainer = document.getElementById('edit-commands-checkboxes');
             editCommandsContainer.innerHTML = Object.values(COMMAND_DATA).map(cmd => `<div class="flex items-center"><input id="edit-cmd-${cmd.name}" type="checkbox" value="${cmd.name}" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded"><label for="edit-cmd-${cmd.name}" class="ml-2 text-sm font-medium text-gray-700">${cmd.name}</label></div>`).join('');
             
-            // Edit Modals
             document.getElementById('close-edit-btn').addEventListener('click', () => closeModal(editModal));
             document.getElementById('cancel-edit-btn').addEventListener('click', () => closeModal(editModal));
             document.getElementById('edit-challenge-form').addEventListener('submit', handleEditUpdate);
