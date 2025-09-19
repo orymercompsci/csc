@@ -13,18 +13,22 @@
         
         /* Styles for rich text content in light mode */
         .description-content { color: #374151; }
-        
-        /* FIXED: More robust styling for lists to ensure indentation */
-        .description-content ul { list-style: disc inside; padding-left: 1rem; margin-bottom: 1rem; }
-        .description-content ol { list-style: decimal inside; padding-left: 1rem; margin-bottom: 1rem; }
-        .description-content li { padding-left: 1rem; margin-bottom: 0.5rem; }
-        .description-content li.ql-indent-1 { margin-left: 2.5rem; }
-        .description-content li.ql-indent-2 { margin-left: 5rem; }
+        .description-content ul, .description-content ol { 
+            margin-left: 1.5rem !important; 
+            margin-bottom: 1rem !important; 
+            list-style-position: outside !important;
+        }
+        .description-content ul { list-style-type: disc !important; }
+        .description-content ol { list-style-type: decimal !important; }
 
+        .description-content li { margin-bottom: 0.5rem; color: #374151; }
         .description-content p { margin-bottom: 1rem; color: #374151; }
         .description-content strong { font-weight: bold; color: #111827; }
         .description-content em { font-style: italic; }
         .description-content h1, .description-content h2 { font-size: 1.25rem; font-weight: bold; color: #111827; margin-bottom: 0.5rem; }
+        
+        .description-content .ql-indent-1 { margin-left: 3rem !important; }
+        .description-content .ql-indent-2 { margin-left: 4.5rem !important; }
         
         /* Quill editor styling for light mode */
         .ql-toolbar { border-radius: 0.5rem 0.5rem 0 0; border-color: #d1d5db !important; }
@@ -155,6 +159,16 @@
             #EF4444
             word = "Hello, World!"
             print(word[6:13])
+            
+            MOD
+            #EF4444
+            remainder = 10 % 3
+            print(remainder)
+
+            DIV
+            #EF4444
+            quotient = 10 // 3
+            print(quotient)
 
             1D Array
             #22C55E
