@@ -165,7 +165,7 @@
               print("The sea is blue")
 
             if/else
-            #F97316
+            #F9T316
             hour = int(input("Enter the hour (24 hour clock) :"))
             if hour < 18:
               print("Good day")
@@ -413,7 +413,13 @@
 
         function setupModals() {
             const editCommandsContainer = document.getElementById('edit-commands-checkboxes');
-            editCommandsContainer.innerHTML = Object.values(COMMAND_DATA).map(cmd => `<div class="flex items-center"><input id="edit-cmd-${cmd.name}" type="checkbox" value="${cmd.name}" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded"><label for="edit-cmd-${cmd.name}" class="ml-2 text-sm font-medium text-gray-700">${cmd.name}</label></div>`).join('');
+            // FIXED: Added inline style to color the labels correctly.
+            editCommandsContainer.innerHTML = Object.values(COMMAND_DATA).map(cmd => `
+                <div class="flex items-center">
+                    <input id="edit-cmd-${cmd.name}" type="checkbox" value="${cmd.name}" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                    <label for="edit-cmd-${cmd.name}" class="ml-2 text-sm font-medium" style="color: ${cmd.color};">${cmd.name}</label>
+                </div>
+            `).join('');
             
             document.getElementById('close-edit-btn').addEventListener('click', () => closeModal(editModal));
             document.getElementById('cancel-edit-btn').addEventListener('click', () => closeModal(editModal));
