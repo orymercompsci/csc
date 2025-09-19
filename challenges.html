@@ -34,13 +34,23 @@
         .ql-toolbar { border-radius: 0.5rem 0.5rem 0 0; border-color: #d1d5db !important; }
         .ql-container { border-radius: 0 0 0.5rem 0.5rem; border-color: #d1d5db !important; min-height: 120px; font-size: 1rem; }
 
-        /* Styles for completed challenge indicator */
+        /* Styles for completed challenge indicator and shrink animation */
         .rank-indicator.is-completed {
             background-color: #22C55E !important; /* Green */
             color: white !important;
         }
         .complete-btn.is-completed {
             color: #22C55E !important; /* Green */
+        }
+        .challenge-body {
+            max-height: 3000px; /* High value for smooth opening */
+            transition: max-height 0.5s ease-in-out, opacity 0.3s ease-in-out, padding-top 0.5s ease-in-out;
+            overflow: hidden;
+        }
+        .challenge-card.is-completed .challenge-body {
+            max-height: 0;
+            opacity: 0;
+            padding-top: 0;
         }
     </style>
 </head>
@@ -53,7 +63,7 @@
             </div>
         </header>
 
-        <main id="challenges-container" class="space-y-8">
+        <main id="challenges-container" class="space-y-4">
             <div id="loading-spinner" class="text-center"><p class="text-lg text-gray-600">Fetching challenges from the database...</p></div>
         </main>
     </div>
@@ -167,7 +177,7 @@
               print("The sea is blue")
 
             if/else
-            #F9T316
+            #F97316
             hour = int(input("Enter the hour (24 hour clock) :"))
             if hour < 18:
               print("Good day")
@@ -293,7 +303,7 @@
                 const isCompleted = localStorage.getItem(`challenge-completed-${challenge.id}`) === 'true';
 
                 const challengeElement = document.createElement('div');
-                challengeElement.className = `bg-white rounded-lg shadow-lg overflow-hidden relative transition-all duration-500`;
+                challengeElement.className = `challenge-card bg-white rounded-lg shadow-lg overflow-hidden relative transition-all duration-500 ${isCompleted ? 'is-completed' : ''}`;
                 challengeElement.id = `challenge-${challenge.id}`;
                 challengeElement.innerHTML = `
                     <div class="absolute top-4 right-4 flex gap-2">
@@ -313,7 +323,7 @@
                                 ${commandTags ? `<div class="text-xs text-gray-500">Commands Used: ${commandTags}</div>` : ''}
                             </div>
                         </div>
-                        <div class="pl-14 pt-4">
+                        <div class="challenge-body pl-14 pt-4">
                             <div class="text-gray-700 mb-6 description-content">${challenge.description}</div>
                             ${testingTableHTML}
                             <div class="mb-6"><h3 class="font-semibold text-lg text-gray-800 mb-2">Expected Screen Output</h3><pre class="bg-gray-200 text-gray-800 rounded-md p-4 font-mono text-sm">${challenge.screenOutput || 'N/A'}</pre></div>
@@ -477,6 +487,8 @@
                     
                     const isCompleted = rankIndicator.classList.toggle('is-completed');
                     completeBtn.classList.toggle('is-completed', isCompleted);
+                    challengeCard.classList.toggle('is-completed', isCompleted);
+
 
                     if (isCompleted) {
                         localStorage.setItem(`challenge-completed-${challengeId}`, 'true');
