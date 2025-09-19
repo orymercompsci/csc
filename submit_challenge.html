@@ -6,58 +6,50 @@
     <title>Submit a Challenge</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Quill Rich Text Editor CSS -->
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-    <style> 
-        body { font-family: 'Poppins', sans-serif; } 
-        .ql-toolbar { border-color: #d1d5db !important; border-top-left-radius: 0.5rem; border-top-right-radius: 0.5rem; }
-        .ql-container { border-color: #d1d5db !important; border-bottom-left-radius: 0.5rem; border-bottom-right-radius: 0.5rem; }
-        .ql-editor { min-height: 120px; color: #111827; }
-        .ql-snow .ql-stroke { stroke: #374151; }
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+        .ql-toolbar { border-radius: 0.5rem 0.5rem 0 0; border-color: #d1d5db !important; }
+        .ql-container { border-radius: 0 0 0.5rem 0.5rem; border-color: #d1d5db !important; min-height: 120px; font-size: 1rem; }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800 min-h-screen py-12">
     <div class="w-full max-w-4xl mx-auto p-4">
-        <div class="bg-white rounded-lg shadow-lg p-8">
+        <div class="bg-white rounded-lg shadow-xl p-8">
             <div class="text-center mb-8">
-                <h1 class="text-3xl font-bold text-gray-900">Submit a New Challenge</h1>
-                <p class="text-gray-600">Fill out the form below. Your submission will be formatted into an email for review.</p>
+                <h1 class="text-3xl font-bold text-gray-900">Contribute a Challenge</h1>
+                <p class="text-gray-600 text-base mt-2">Found a great challenge? Fill out the form below to submit it for review. Your submission will be sent via email.</p>
             </div>
             <form id="submit-challenge-form" class="space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div><label for="topic-select" class="block mb-2 text-sm font-medium text-gray-700">Topic</label><select id="topic-select" name="topic" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required><option value="sequence">Sequence</option><option value="selection">Selection</option><option value="iteration">Iteration</option><option value="data-structures">Data Structures</option><option value="file-handling">File Handling</option><option value="subprograms">Subprograms</option><option value="exam-questions">Exam Questions</option></select></div>
-                    <div><label for="challenge-title" class="block mb-2 text-sm font-medium text-gray-700">Challenge Title</label><input type="text" id="challenge-title" name="title" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="e.g., 'Sum of Two Numbers'" required></div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="md:col-span-2"><label for="challenge-title" class="block mb-2 text-sm font-medium text-gray-700">Challenge Title</label><input type="text" id="challenge-title" name="title" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5" placeholder="e.g., 'Sum of Two Numbers'" required></div>
+                    <div><label for="challenge-rank" class="block mb-2 text-sm font-medium text-gray-700">Suggested Rank</label><input type="number" id="challenge-rank" name="rank" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5" value="0" required></div>
                 </div>
-                <div><label for="challenge-description" class="block mb-2 text-sm font-medium text-gray-700">Challenge Description</label><div id="description-editor" class="bg-white"></div></div>
-                <div>
-                    <label class="block mb-2 text-sm font-medium text-gray-700">Commands Used</label>
-                    <div id="commands-checkboxes" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 bg-gray-50 border border-gray-300 p-4 rounded-lg max-h-48 overflow-y-auto">
-                        <!-- Checkboxes will be inserted here by JavaScript -->
-                    </div>
-                </div>
-                <div><label for="screen-output" class="block mb-2 text-sm font-medium text-gray-700">Expected Screen Output</label><textarea id="screen-output" name="screenOutput" rows="4" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 font-mono" placeholder="Show what the console output should look like."></textarea></div>
+                <div><label for="topic-select" class="block mb-2 text-sm font-medium text-gray-700">Topic</label><select id="topic-select" name="topic" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5" required><option value="sequence">Sequence</option><option value="selection">Selection</option><option value="iteration">Iteration</option><option value="data-structures">Data Structures</option><option value="file-handling">File Handling</option><option value="subprograms">Subprograms</option><option value="exam-questions">Exam Questions</option></select></div>
+                <div><label for="challenge-description" class="block mb-2 text-sm font-medium text-gray-700">Challenge Description</label><div id="challenge-description" class="bg-white"></div></div>
+                <div><label class="block mb-2 text-sm font-medium text-gray-700">Commands Used</label><div id="commands-checkboxes" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 bg-gray-50 p-4 rounded-lg max-h-48 overflow-y-auto border border-gray-300"></div></div>
+                <div><label for="screen-output" class="block mb-2 text-sm font-medium text-gray-700">Expected Screen Output</label><textarea id="screen-output" name="screenOutput" rows="4" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 font-mono" placeholder="Show what the console output should look like."></textarea></div>
                 <fieldset class="border border-gray-300 p-4 rounded-lg">
                     <legend class="text-sm font-medium text-gray-700 px-2">Testing Table</legend>
                     <div class="space-y-4">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4"><input type="text" id="test-1" name="test-1" class="bg-gray-50 border-gray-300 text-sm rounded-lg p-2" placeholder="Test 1"><input type="text" id="input-1" name="input-1" class="bg-gray-50 border-gray-300 text-sm rounded-lg p-2" placeholder="Input 1"><input type="text" id="output-1" name="output-1" class="bg-gray-50 border-gray-300 text-sm rounded-lg p-2" placeholder="Output 1"></div>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4"><input type="text" id="test-2" name="test-2" class="bg-gray-50 border-gray-300 text-sm rounded-lg p-2" placeholder="Test 2"><input type="text" id="input-2" name="input-2" class="bg-gray-50 border-gray-300 text-sm rounded-lg p-2" placeholder="Input 2"><input type="text" id="output-2" name="output-2" class="bg-gray-50 border-gray-300 text-sm rounded-lg p-2" placeholder="Output 2"></div>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4"><input type="text" id="test-3" name="test-3" class="bg-gray-50 border-gray-300 text-sm rounded-lg p-2" placeholder="Test 3"><input type="text" id="input-3" name="input-3" class="bg-gray-50 border-gray-300 text-sm rounded-lg p-2" placeholder="Input 3"><input type="text" id="output-3" name="output-3" class="bg-gray-50 border-gray-300 text-sm rounded-lg p-2" placeholder="Output 3"></div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4"><input type="text" name="test-1" class="bg-gray-50 border-gray-300 text-sm rounded-lg p-2" placeholder="Test 1"><input type="text" name="input-1" class="bg-gray-50 border-gray-300 text-sm rounded-lg p-2" placeholder="Input 1"><input type="text" name="output-1" class="bg-gray-50 border-gray-300 text-sm rounded-lg p-2" placeholder="Output 1"></div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4"><input type="text" name="test-2" class="bg-gray-50 border-gray-300 text-sm rounded-lg p-2" placeholder="Test 2"><input type="text" name="input-2" class="bg-gray-50 border-gray-300 text-sm rounded-lg p-2" placeholder="Input 2"><input type="text" name="output-2" class="bg-gray-50 border-gray-300 text-sm rounded-lg p-2" placeholder="Output 2"></div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4"><input type="text" name="test-3" class="bg-gray-50 border-gray-300 text-sm rounded-lg p-2" placeholder="Test 3"><input type="text" name="input-3" class="bg-gray-50 border-gray-300 text-sm rounded-lg p-2" placeholder="Input 3"><input type="text" name="output-3" class="bg-gray-50 border-gray-300 text-sm rounded-lg p-2" placeholder="Output 3"></div>
                     </div>
                 </fieldset>
-                <div><label for="solution" class="block mb-2 text-sm font-medium text-gray-700">Solution Code</label><textarea id="solution" name="solution" rows="6" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 font-mono" placeholder="Enter the solution code here."></textarea></div>
-                <div class="flex items-center justify-between pt-4"><a href="index.html" class="text-sm text-gray-500 hover:text-gray-800 transition">&larr; Back to Home</a><button type="submit" id="submit-btn" class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center transition-colors">Submit Challenge via Email</button></div>
+                <div><label for="solution" class="block mb-2 text-sm font-medium text-gray-700">Solution Code</label><textarea id="solution" name="solution" rows="6" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 font-mono" placeholder="Enter the solution code here."></textarea></div>
+                <div class="flex items-center justify-between pt-4"><a href="index.html" class="text-sm text-gray-500 hover:text-gray-800 transition">&larr; Back to Home</a><button type="submit" id="submit-btn" class="text-white bg-blue-600 hover:bg-blue-700 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">Submit via Email</button></div>
             </form>
-             <div id="status-message" class="mt-6 text-center text-sm font-medium"></div>
+            <div id="status-message" class="mt-6 text-center text-sm font-medium"></div>
         </div>
     </div>
+    
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     <script type="module">
+        let quill;
         const form = document.getElementById("submit-challenge-form");
         const statusMessage = document.getElementById("status-message");
-
-        const quill = new Quill('#description-editor', {
-            theme: 'snow',
-            modules: { toolbar: [ ['bold', 'italic'], [{ 'list': 'ordered'}, { 'list': 'bullet' }], [{ 'indent': '-1'}, { 'indent': '+1' }] ] }
-        });
 
         const COMMAND_DATA_TEXT = `
             print()
@@ -97,6 +89,16 @@
             #EF4444
             word = "Hello, World!"
             print(word[6:13])
+            
+            MOD
+            #EF4444
+            remainder = 10 % 3
+            print(remainder)
+
+            DIV
+            #EF4444
+            quotient = 10 // 3
+            print(quotient)
 
             1D Array
             #22C55E
@@ -148,10 +150,17 @@
 
             file.readline()
             #3B82F6
+            # file = open("days.txt",'r')
+            # dataRead = file.readline()
+            # file.close()
+            # print(dataRead)
             print("File reading requires a local Python environment.")
 
             file.writelines()
             #3B82F6
+            # file = open("days.txt",'w')
+            # dataRead = file.writelines("This text will be written to a file.")
+            # file.close()
             print("File writing requires a local Python environment.")
 
             Procedures
@@ -176,70 +185,81 @@
             print(total)
         `;
 
-        function parseCommandData(text) {
-            const commandObject = {};
-            const entries = text.trim().split(/\n\s*\n/);
-            entries.forEach(entry => {
-                const lines = entry.trim().split('\n');
-                const name = lines[0].trim();
-                const color = lines[1].trim();
-                const example = lines.slice(2).join('\n');
-                const key = name.replace(/\(\)/g, '').toLowerCase();
-                commandObject[key] = { name, color, example };
-            });
-            return commandObject;
-        }
+        function parseCommandData(text) { const commandObject = {}; const entries = text.trim().split(/\n\s*\n/); entries.forEach(entry => { const lines = entry.trim().split('\n'); const name = lines[0].trim(); const color = lines[1].trim(); const example = lines.slice(2).join('\n'); const key = name.replace(/\(\)/g, '').toLowerCase(); commandObject[key] = { name, color, example }; }); return commandObject; }
 
         function populateCommandsCheckboxes() {
             const COMMAND_DATA = parseCommandData(COMMAND_DATA_TEXT);
             const container = document.getElementById('commands-checkboxes');
-            container.innerHTML = '';
-            for (const key in COMMAND_DATA) {
-                const command = COMMAND_DATA[key];
-                const checkboxDiv = document.createElement('div');
-                checkboxDiv.className = 'flex items-center';
-                checkboxDiv.innerHTML = `
-                    <input id="cmd-${key}" type="checkbox" value="${command.name}" name="commands" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
-                    <label for="cmd-${key}" class="ml-2 text-sm font-medium" style="color: ${command.color};">${command.name}</label>
-                `;
-                container.appendChild(checkboxDiv);
-            }
+            container.innerHTML = Object.values(COMMAND_DATA).map(cmd => `
+                <div class="flex items-center">
+                    <input id="cmd-${cmd.name}" type="checkbox" value="${cmd.name}" name="commands" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                    <label for="cmd-${cmd.name}" class="ml-2 text-sm font-medium" style="color: ${cmd.color};">${cmd.name}</label>
+                </div>
+            `).join('');
         }
 
-         function updateStatus(message, type = "success") { 
-            statusMessage.textContent = message;
-            statusMessage.className = `mt-6 text-center text-sm font-medium ${type === "success" ? "text-green-600" : "text-red-600"}`;
-        } 
+        function plainTextFromHTML(html) {
+            const tempDiv = document.createElement("div");
+            tempDiv.innerHTML = html;
+            return tempDiv.textContent || tempDiv.innerText || "";
+        }
 
         form.addEventListener("submit", e => {
             e.preventDefault();
             const formData = new FormData(form);
-            const selectedCommands = Array.from(document.querySelectorAll('#commands-checkboxes input:checked')).map(cb => cb.value);
-
-            let body = `A new challenge has been submitted for review.\n\n`;
-            body += `========================================\n\n`;
-            body += `TOPIC:\n${formData.get('topic')}\n\n`;
-            body += `TITLE:\n${formData.get('title')}\n\n`;
-            body += `DESCRIPTION (HTML):\n${quill.root.innerHTML}\n\n`;
-            body += `COMMANDS USED:\n${selectedCommands.join(', ')}\n\n`;
-            body += `EXPECTED SCREEN OUTPUT:\n${formData.get('screenOutput')}\n\n`;
+            const topic = formData.get('topic');
+            const title = formData.get('title');
+            const rank = formData.get('rank');
+            const descriptionHtml = quill.root.innerHTML;
+            const descriptionText = plainTextFromHTML(descriptionHtml);
+            const screenOutput = formData.get('screenOutput');
+            const solution = formData.get('solution');
             
-            body += `TESTING TABLE:\n`;
-            body += `1. Test: ${formData.get('test-1')}, Input: ${formData.get('input-1')}, Output: ${formData.get('output-1')}\n`;
-            body += `2. Test: ${formData.get('test-2')}, Input: ${formData.get('input-2')}, Output: ${formData.get('output-2')}\n`;
-            body += `3. Test: ${formData.get('test-3')}, Input: ${formData.get('input-3')}, Output: ${formData.get('output-3')}\n\n`;
+            const testingTable = [];
+            for (let i = 1; i <= 3; i++) {
+                const test = formData.get(`test-${i}`), input = formData.get(`input-${i}`), output = formData.get(`output-${i}`);
+                if (test || input || output) {
+                    testingTable.push(`Test ${i}: ${test} | Input: ${input} | Output: ${output}`);
+                }
+            }
 
-            body += `SOLUTION CODE:\n${formData.get('solution')}\n\n`;
-            body += `========================================\n`;
+            const selectedCommands = Array.from(document.querySelectorAll('#commands-checkboxes input:checked')).map(cb => cb.value).join(', ');
 
-            const subject = `New Challenge Submission: ${formData.get('title')}`;
+            const subject = `New Challenge Submission: ${title}`;
+            let body = `A new challenge has been submitted for review.\n\n`;
+            body += `----------------------------------------\n`;
+            body += `TOPIC: ${topic}\n`;
+            body += `TITLE: ${title}\n`;
+            body += `SUGGESTED RANK: ${rank}\n`;
+            body += `COMMANDS USED: ${selectedCommands}\n\n`;
+            body += `--- DESCRIPTION ---\n${descriptionText}\n\n`;
+            body += `--- EXPECTED SCREEN OUTPUT ---\n${screenOutput}\n\n`;
+            if (testingTable.length > 0) {
+                body += `--- TESTING TABLE ---\n${testingTable.join('\n')}\n\n`;
+            }
+            body += `--- SOLUTION CODE ---\n${solution}\n\n`;
+            body += `----------------------------------------\n\n`;
+            body += `For HTML rendering, here is the raw description:\n${descriptionHtml}`;
+            
             const mailtoLink = `mailto:orymercompsci@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
             
-            updateStatus('Please open your email client to send the submission.', 'success');
+            statusMessage.textContent = "Please click the link to open your email client and send the submission.";
+            statusMessage.className = "mt-6 text-center text-sm font-medium text-green-600";
+            
+            const link = document.createElement('a');
+            link.href = mailtoLink;
+            link.textContent = "Open Email Client";
+            link.className = "text-white bg-green-600 hover:bg-green-700 font-medium rounded-lg text-sm px-5 py-2.5 ml-4";
+            statusMessage.appendChild(link);
+
+            // This will attempt to open the mail client automatically
             window.location.href = mailtoLink;
         });
 
-        document.addEventListener("DOMContentLoaded", populateCommandsCheckboxes);
+        document.addEventListener("DOMContentLoaded", () => { 
+            quill = new Quill('#challenge-description', { theme: 'snow', modules: { toolbar: [[ 'bold', 'italic', 'underline' ], [{ 'list': 'ordered'}, { 'list': 'bullet' }], [{ 'indent': '-1'}, { 'indent': '+1' }]] } });
+            populateCommandsCheckboxes();
+        });
     </script>
 </body>
 </html>
