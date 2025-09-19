@@ -63,7 +63,6 @@
                 <div><label for="edit-description" class="block mb-2 text-sm font-medium text-gray-700">Challenge Description</label><div id="edit-description" class="bg-white"></div></div>
                 <div><label class="block mb-2 text-sm font-medium text-gray-700">Commands Used</label><div id="edit-commands-checkboxes" class="grid grid-cols-2 sm:grid-cols-4 gap-4 bg-gray-50 p-4 rounded-lg border border-gray-300"></div></div>
                 
-                <!-- ADDED: Testing Table in Edit Modal -->
                 <fieldset class="border border-gray-300 p-4 rounded-lg">
                     <legend class="text-sm font-medium text-gray-700 px-2">Testing Table</legend>
                     <div id="edit-testing-table" class="space-y-4">
@@ -260,7 +259,6 @@
                     return commandInfo ? `<span class="font-semibold" style="color: ${commandInfo.color};">${commandInfo.name}</span>` : `<span>${cmdKey}</span>`;
                 }).join(', ');
                 
-                // FIXED: Logic to build the testing table HTML
                 const testingTableRows = (challenge.testingTable || []).map(row => `
                     <tr class="border-b border-gray-200">
                         <td class="p-2">${escapeHTML(row.test || '')}</td>
@@ -390,7 +388,6 @@
             document.getElementById('edit-solution').value = challenge.solution || '';
             document.getElementById('edit-error').textContent = '';
             
-            // Populate testing table in edit modal
             const testingTableContainer = document.getElementById('edit-testing-table');
             testingTableContainer.innerHTML = '';
             for (let i = 1; i <= 3; i++) {
@@ -398,9 +395,9 @@
                 const row = document.createElement('div');
                 row.className = 'grid grid-cols-1 md:grid-cols-3 gap-4';
                 row.innerHTML = `
-                    <input type="text" id="edit-test-${i}" class="bg-gray-50 border-gray-300 text-sm rounded-lg p-2" placeholder="Test ${i}" value="${rowData.test || ''}">
-                    <input type="text" id="edit-input-${i}" class="bg-gray-50 border-gray-300 text-sm rounded-lg p-2" placeholder="Input ${i}" value="${rowData.input || ''}">
-                    <input type="text" id="edit-output-${i}" class="bg-gray-50 border-gray-300 text-sm rounded-lg p-2" placeholder="Output ${i}" value="${rowData.output || ''}">
+                    <input type="text" id="edit-test-${i}" class="bg-gray-50 border-gray-300 text-sm rounded-lg p-2" placeholder="Test ${i}" value="${escapeHTML(rowData.test || '')}">
+                    <input type="text" id="edit-input-${i}" class="bg-gray-50 border-gray-300 text-sm rounded-lg p-2" placeholder="Input ${i}" value="${escapeHTML(rowData.input || '')}">
+                    <input type="text" id="edit-output-${i}" class="bg-gray-50 border-gray-300 text-sm rounded-lg p-2" placeholder="Output ${i}" value="${escapeHTML(rowData.output || '')}">
                 `;
                 testingTableContainer.appendChild(row);
             }
