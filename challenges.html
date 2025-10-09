@@ -268,7 +268,7 @@
                                 ${commandTags ? `<div class="text-xs text-gray-500">Commands Used: ${commandTags}</div>` : ''}
                             </div>
                             <div class="ml-4 flex-shrink-0">
-                                <svg class="expand-arrow w-6 h-6 text-gray-500" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                <svg class="expand-arrow w-6 h-6 text-gray-500" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                             </div>
                         </div>
                         <div class="challenge-body pl-14">
@@ -385,7 +385,35 @@
             document.querySelectorAll('#edit-commands-checkboxes input').forEach(cb => { cb.checked = usedCommands.includes(cb.value); });
             openModal(editModal);
         }
+
+        async function handleDeleteConfirm(e) {
+            e.preventDefault();
+            const passwordInput = document.getElementById('delete-password-input');
+            const deleteError = document.getElementById('delete-error');
+            if (passwordInput.value === 'Nintendo1') {
+                try {
+                    await deleteDoc(doc(db, 'challenges', challengeToDeleteId));
+                    closeModal(deleteModal);
+                    fetchAndRenderChallenges();
+                } catch (error) {
+                    console.error("Error deleting document: ", error);
+                    deleteError.textContent = 'Failed to delete challenge.';
+                }
+            } else {
+                deleteError.textContent = 'Incorrect password.';
+                passwordInput.value = '';
+            }
+        }
         
+        function openDeleteModal(challengeId) {
+            challengeToDeleteId = challengeId;
+            const passwordInput = document.getElementById('delete-password-input');
+            passwordInput.value = '';
+            document.getElementById('delete-error').textContent = '';
+            openModal(deleteModal);
+            passwordInput.focus();
+        }
+
         function setupModals() {
             const editCommandsContainer = document.getElementById('edit-commands-checkboxes');
             editCommandsContainer.innerHTML = Object.values(COMMAND_DATA).map(cmd => `
@@ -400,6 +428,9 @@
             document.getElementById('edit-challenge-form').addEventListener('submit', handleEditUpdate);
             document.getElementById('edit-auth-form').addEventListener('submit', handleEditAuthConfirm);
             document.getElementById('cancel-edit-auth-btn').addEventListener('click', () => closeModal(editAuthModal));
+
+            document.getElementById('delete-form').addEventListener('submit', handleDeleteConfirm);
+            document.getElementById('cancel-delete-btn').addEventListener('click', () => closeModal(deleteModal));
         }
 
         async function main() {
@@ -427,7 +458,7 @@
                     return; 
                 }
                 if (deleteBtn){
-                    // Delete logic here
+                    openDeleteModal(deleteBtn.dataset.id);
                     return;
                 }
                 
