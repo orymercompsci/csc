@@ -59,7 +59,7 @@
         /* Styles for completed challenges */
         .challenge-card.is-completed {
             background-color: #F0FFF4; /* Light green */
-            border: 1px solid #48BB78; /* Green border */
+            border-color: #48BB78; /* Green border */
         }
         .challenge-card.is-completed .rank-indicator {
             background-color: #22C55E !important; /* Green */
@@ -274,7 +274,7 @@
                 const isCompleted = localStorage.getItem(`challenge-completed-${challenge.id}`) === 'true';
 
                 const challengeElement = document.createElement('div');
-                challengeElement.className = `challenge-card bg-white rounded-lg shadow-lg overflow-hidden relative transition-all duration-500 border ${isCompleted ? 'is-completed' : 'border-transparent'}`;
+                challengeElement.className = `challenge-card bg-white rounded-lg shadow-lg overflow-hidden relative transition-all duration-500 border border-gray-200 ${isCompleted ? 'is-completed' : ''}`;
                 challengeElement.id = `challenge-${challenge.id}`;
                 challengeElement.innerHTML = `
                     <div class="absolute top-4 right-4 flex gap-2">
@@ -457,7 +457,6 @@
                     const isNowCompleted = card.classList.toggle('is-completed');
                     rankIndicator.classList.toggle('is-completed', isNowCompleted);
                     completeBtn.classList.toggle('is-completed', isNowCompleted);
-                    card.classList.toggle('border-transparent', !isNowCompleted);
 
                     if (isNowCompleted) {
                         localStorage.setItem(`challenge-completed-${challengeId}`, 'true');
