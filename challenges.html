@@ -100,9 +100,6 @@
             </form>
         </div>
     </div>
-
-    <!-- Delete Modal -->
-    <div id="delete-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden"><div class="bg-white p-8 rounded-lg shadow-xl text-center w-full max-w-sm"><h2 class="text-xl font-bold text-gray-900 mb-4">Confirm Deletion</h2><p class="text-gray-600 text-sm mb-6">Enter admin password to delete.</p><form id="delete-form" class="flex flex-col gap-4"><input type="password" id="delete-password-input" class="bg-gray-200 border-gray-400 text-sm rounded-lg p-2.5 text-center" placeholder="Password" required><div class="flex gap-4"><button type="button" id="cancel-delete-btn" class="w-full text-gray-800 bg-gray-200 hover:bg-gray-300 font-medium rounded-lg text-sm px-5 py-2.5">Cancel</button><button type="submit" id="confirm-delete-btn" class="w-full text-white bg-red-600 hover:bg-red-700 font-medium rounded-lg text-sm px-5 py-2.5">Delete</button></div><p id="delete-error" class="text-red-500 text-sm mt-2 h-4"></p></form></div></div>
     
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     <script> const firebaseConfig = { apiKey: "AIzaSyDWfJRQhNUgktjIQaFVsoAqhsZtUQD3fpQ", authDomain: "cs-challenges-website.firebaseapp.com", projectId: "cs-challenges-website", storageBucket: "cs-challenges-website.firebasestorage.app", messagingSenderId: "1062820761218", appId: "1:1062820761218:web:ab4382d3f981d3f586ee9b" }; </script>
@@ -114,11 +111,9 @@
         let db, quillEdit;
         let localChallenges = [];
         let challengeToEditId = null;
-        let challengeToDeleteId = null;
 
         const challengesContainer = document.getElementById('challenges-container');
         
-        const deleteModal = document.getElementById('delete-modal');
         const editModal = document.getElementById('edit-modal');
         const editAuthModal = document.getElementById('edit-auth-modal');
 
@@ -272,7 +267,6 @@
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
                         </button>
                         <button class="edit-challenge-btn text-gray-400 hover:text-blue-600 transition-colors" title="Edit Challenge" data-id="${challenge.id}"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>
-                        <button class="delete-challenge-btn text-gray-400 hover:text-red-600 transition-colors" title="Delete Challenge" data-id="${challenge.id}"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
                     </div>
                     <div class="p-6">
                         <div class="flex items-start">
@@ -432,14 +426,9 @@
             
             challengesContainer.addEventListener('click', e => {
                 const editBtn = e.target.closest('.edit-challenge-btn');
-                const deleteBtn = e.target.closest('.delete-challenge-btn');
                 const completeBtn = e.target.closest('.complete-btn');
 
                 if (editBtn) openEditAuthModal(editBtn.dataset.id);
-                
-                if (deleteBtn) {
-                     // Logic for delete button will go here
-                }
                 
                 if (completeBtn) {
                     const challengeId = completeBtn.dataset.id;
@@ -462,3 +451,4 @@
     </script>
 </body>
 </html>
+
