@@ -19,29 +19,22 @@
         body { font-family: 'Poppins', sans-serif; }
 
         .topic-card {
-            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         .topic-card:hover {
             transform: translateY(-8px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
         }
 
-        /* Rainbow Accent Colors for Borders and Text */
-        #sequence h2 { border-color: #EF4444; color: #EF4444; }
-        #selection h2 { border-color: #F97316; color: #F97316; }
-        #iteration h2 { border-color: #EAB308; color: #EAB308; }
-        #data-structures h2 { border-color: #22C55E; color: #22C55E; }
-        #file-handling h2 { border-color: #3B82F6; color: #3B82F6; }
-        #subprograms h2 { border-color: #8B5CF6; color: #8B5CF6; }
-        #exam-questions h2 { border-color: #6366F1; color: #6366F1; }
-        
-        #sequence:hover { border-color: #EF4444; }
-        #selection:hover { border-color: #F97316; }
-        #iteration:hover { border-color: #EAB308; }
-        #data-structures:hover { border-color: #22C55E; }
-        #file-handling:hover { border-color: #3B82F6; }
-        #subprograms:hover { border-color: #8B5CF6; }
-        #exam-questions:hover { border-color: #6366F1; }
+        /* Rainbow Background Colors */
+        #sequence { background-color: #EF4444; }
+        #selection { background-color: #F97316; }
+        #iteration { background-color: #EAB308; }
+        #data-structures { background-color: #22C55E; }
+        #string-manipulation { background-color: #14B8A6; }
+        #file-handling { background-color: #3B82F6; }
+        #subprograms { background-color: #8B5CF6; }
+        #exam-questions { background-color: #6366F1; }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
@@ -52,41 +45,44 @@
             <p class="text-sm text-gray-600 mt-2">Select a topic to begin practicing.</p>
         </header>
 
-        <main class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            <a href="challenges.html?topic=sequence" class="topic-card bg-white border-2 border-gray-200 rounded-lg p-6 flex flex-col" id="sequence">
-                <h2 class="text-lg font-bold border-b-4 pb-2 mb-3">Sequence</h2>
-                <p class="text-gray-600 text-xs flex-grow">Challenges based on executing statements in order.</p>
+        <main class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            <a href="challenges.html?topic=sequence" class="topic-card rounded-lg p-6 flex flex-col text-white" id="sequence">
+                <h2 class="text-lg font-bold border-b-2 border-white/50 pb-2 mb-3">Sequence</h2>
+                <p class="text-white/80 text-xs flex-grow">Challenges based on executing statements in order.</p>
             </a>
-            <a href="challenges.html?topic=selection" class="topic-card bg-white border-2 border-gray-200 rounded-lg p-6 flex flex-col" id="selection">
-                <h2 class="text-lg font-bold border-b-4 pb-2 mb-3">Selection</h2>
-                <p class="text-gray-600 text-xs flex-grow">Using if, else, and switch to control program flow.</p>
+            <a href="challenges.html?topic=selection" class="topic-card rounded-lg p-6 flex flex-col text-white" id="selection">
+                <h2 class="text-lg font-bold border-b-2 border-white/50 pb-2 mb-3">Selection</h2>
+                <p class="text-white/80 text-xs flex-grow">Using if, else, and switch to control program flow.</p>
             </a>
-            <a href="challenges.html?topic=iteration" class="topic-card bg-white border-2 border-gray-200 rounded-lg p-6 flex flex-col" id="iteration">
-                <h2 class="text-lg font-bold border-b-4 pb-2 mb-3">Iteration</h2>
-                <p class="text-gray-600 text-xs flex-grow">Challenges involving loops (for, while).</p>
+            <a href="challenges.html?topic=iteration" class="topic-card rounded-lg p-6 flex flex-col text-white" id="iteration">
+                <h2 class="text-lg font-bold border-b-2 border-white/50 pb-2 mb-3">Iteration</h2>
+                <p class="text-white/80 text-xs flex-grow">Challenges involving loops (for, while).</p>
             </a>
-            <a href="challenges.html?topic=data-structures" class="topic-card bg-white border-2 border-gray-200 rounded-lg p-6 flex flex-col" id="data-structures">
-                <h2 class="text-lg font-bold border-b-4 pb-2 mb-3">Data Structures</h2>
-                <p class="text-gray-600 text-xs flex-grow">Working with 1D and 2D arrays.</p>
+            <a href="challenges.html?topic=data-structures" class="topic-card rounded-lg p-6 flex flex-col text-white" id="data-structures">
+                <h2 class="text-lg font-bold border-b-2 border-white/50 pb-2 mb-3">Data Structures</h2>
+                <p class="text-white/80 text-xs flex-grow">Working with 1D and 2D arrays.</p>
             </a>
-            <a href="challenges.html?topic=file-handling" class="topic-card bg-white border-2 border-gray-200 rounded-lg p-6 flex flex-col" id="file-handling">
-                <h2 class="text-lg font-bold border-b-4 pb-2 mb-3">File Handling</h2>
-                <p class="text-gray-600 text-xs flex-grow">Reading from and writing to external files.</p>
+            <a href="challenges.html?topic=string-manipulation" class="topic-card rounded-lg p-6 flex flex-col text-white" id="string-manipulation">
+                <h2 class="text-lg font-bold border-b-2 border-white/50 pb-2 mb-3">String Manipulation</h2>
+                <p class="text-white/80 text-xs flex-grow">Working with text, substrings, and concatenation.</p>
             </a>
-            <a href="challenges.html?topic=subprograms" class="topic-card bg-white border-2 border-gray-200 rounded-lg p-6 flex flex-col" id="subprograms">
-                <h2 class="text-lg font-bold border-b-4 pb-2 mb-3">Subprograms</h2>
-                <p class="text-gray-600 text-xs flex-grow">Creating and using functions and procedures.</p>
+            <a href="challenges.html?topic=file-handling" class="topic-card rounded-lg p-6 flex flex-col text-white" id="file-handling">
+                <h2 class="text-lg font-bold border-b-2 border-white/50 pb-2 mb-3">File Handling</h2>
+                <p class="text-white/80 text-xs flex-grow">Reading from and writing to external files.</p>
             </a>
-            <a href="challenges.html?topic=exam-questions" class="topic-card bg-white border-2 border-gray-200 rounded-lg p-6 flex flex-col md:col-span-2 lg:col-span-3" id="exam-questions">
-                <h2 class="text-lg font-bold border-b-4 pb-2 mb-3">Exam Questions</h2>
-                <p class="text-gray-600 text-xs flex-grow">Practice questions in a typical exam style.</p>
+            <a href="challenges.html?topic=subprograms" class="topic-card rounded-lg p-6 flex flex-col text-white" id="subprograms">
+                <h2 class="text-lg font-bold border-b-2 border-white/50 pb-2 mb-3">Subprograms</h2>
+                <p class="text-white/80 text-xs flex-grow">Creating and using functions and procedures.</p>
+            </a>
+            <a href="challenges.html?topic=exam-questions" class="topic-card rounded-lg p-6 flex flex-col text-white" id="exam-questions">
+                <h2 class="text-lg font-bold border-b-2 border-white/50 pb-2 mb-3">Exam Questions</h2>
+                <p class="text-white/80 text-xs flex-grow">Practice questions in a typical exam style.</p>
             </a>
         </main>
 
         <footer class="text-center mt-12 text-xs text-gray-500">
             <p>
-                <a href="admin.html" class="hover:text-gray-800 font-medium">Admin Panel</a> | 
-                <a href="submit_challenge.html" class="hover:text-gray-800 font-medium">Contribute a Challenge</a>
+                <a href="admin.html" class="hover:text-gray-800 font-medium">Add Challenge</a>
             </p>
         </footer>
     </div>
