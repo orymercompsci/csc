@@ -145,7 +145,7 @@
             Concatenation
             #EF4444
 
-            Slicing
+            Sub-string
             #EF4444
 
             MOD
@@ -167,6 +167,9 @@
             #F97316
 
             if/elif/else
+            #F97316
+
+            AND/OR/NOT
             #F97316
 
             for
@@ -225,7 +228,7 @@
             }
             challenges.forEach((challenge, index) => {
                 const commandTags = (challenge.commandsUsed || '').split(',').map(cmd => cmd.trim().toLowerCase()).filter(Boolean).map(cmdKey => {
-                    const commandInfo = COMMAND_DATA[cmdKey.replace(/\(\)/g, '')] || COMMAND_DATA[cmdKey];
+                    const commandInfo = COMMAND_DATA[cmdKey.replace(/\(\)/g, '').replace('sub-string', 'sub-string')] || COMMAND_DATA[cmdKey];
                     return commandInfo ? `<span class="font-semibold" style="color: ${commandInfo.color};">${commandInfo.name}</span>` : `<span>${cmdKey}</span>`;
                 }).join(', ');
                 
