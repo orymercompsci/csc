@@ -36,7 +36,7 @@
                     <div class="md:col-span-2"><label for="challenge-title" class="block mb-2 text-sm font-medium text-gray-700">Challenge Title</label><input type="text" id="challenge-title" name="title" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5" placeholder="e.g., 'Sum of Two Numbers'" required></div>
                     <div><label for="challenge-rank" class="block mb-2 text-sm font-medium text-gray-700">Initial Rank</label><input type="number" id="challenge-rank" name="rank" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5" value="0" required></div>
                 </div>
-                <div><label for="topic-select" class="block mb-2 text-sm font-medium text-gray-700">Topic</label><select id="topic-select" name="topic" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5" required><option value="sequence">Sequence</option><option value="selection">Selection</option><option value="iteration">Iteration</option><option value="data-structures">Data Structures</option><option value="file-handling">File Handling</option><option value="subprograms">Subprograms</option><option value="exam-questions">Exam Questions</option></select></div>
+                <div><label for="topic-select" class="block mb-2 text-sm font-medium text-gray-700">Topic</label><select id="topic-select" name="topic" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5" required><option value="sequence">Sequence</option><option value="selection">Selection</option><option value="iteration">Iteration</option><option value="data-structures">Data Structures</option><option value="string-manipulation">String Manipulation</option><option value="file-handling">File Handling</option><option value="subprograms">Subprograms</option><option value="exam-questions">Exam Questions</option></select></div>
                 <div><label for="challenge-description" class="block mb-2 text-sm font-medium text-gray-700">Challenge Description</label><div id="challenge-description" class="bg-white"></div></div>
                 <div><label class="block mb-2 text-sm font-medium text-gray-700">Commands Used</label><div id="commands-checkboxes" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 bg-gray-50 p-4 rounded-lg max-h-48 overflow-y-auto border border-gray-300"></div></div>
                 <div><label for="screen-output" class="block mb-2 text-sm font-medium text-gray-700">Expected Screen Output</label><textarea id="screen-output" name="screenOutput" rows="4" class="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-lg block w-full p-2.5 font-mono" placeholder="Show what the console output should look like."></textarea></div>
@@ -88,7 +88,7 @@
             Concatenation
             #EF4444
 
-            Slicing
+            Sub-string
             #EF4444
 
             MOD
@@ -112,6 +112,9 @@
             if/elif/else
             #F97316
 
+            AND/OR/NOT
+            #F97316
+
             for
             #EAB308
 
@@ -131,7 +134,7 @@
             #6366F1
         `;
 
-        function parseCommandData(text) { const commandObject = {}; const entries = text.trim().split(/\n\s*\n/); entries.forEach(entry => { const lines = entry.trim().split('\n'); const name = lines[0].trim(); const color = lines[1].trim(); const example = lines.slice(2).join('\n'); const key = name.replace(/\(\)/g, '').toLowerCase(); commandObject[key] = { name, color, example }; }); return commandObject; }
+        function parseCommandData(text) { const commandObject = {}; const entries = text.trim().split(/\n\s*\n/); entries.forEach(entry => { const lines = entry.trim().split('\n'); const name = lines[0].trim(); const color = lines[1].trim(); const key = name.replace(/\(\)/g, '').toLowerCase(); commandObject[key] = { name, color }; }); return commandObject; }
 
         function populateCommandsCheckboxes() {
             const COMMAND_DATA = parseCommandData(COMMAND_DATA_TEXT);
