@@ -37,6 +37,11 @@
         .ql-toolbar { border-radius: 0.5rem 0.5rem 0 0; border-color: #d1d5db !important; }
         .ql-container { border-radius: 0 0 0.5rem 0.5rem; border-color: #d1d5db !important; min-height: 120px; font-size: 0.875rem; }
 
+        /* Base styles for challenge cards */
+        .challenge-card {
+            border: 1px solid #e5e7eb; /* Default gray border */
+        }
+
         /* Styles for expanding/collapsing challenge cards */
         .challenge-header {
             cursor: pointer;
@@ -274,7 +279,7 @@
                 const isCompleted = localStorage.getItem(`challenge-completed-${challenge.id}`) === 'true';
 
                 const challengeElement = document.createElement('div');
-                challengeElement.className = `challenge-card bg-white rounded-lg shadow-lg overflow-hidden relative transition-all duration-500 border border-gray-200 ${isCompleted ? 'is-completed' : ''}`;
+                challengeElement.className = `challenge-card bg-white rounded-lg shadow-lg overflow-hidden relative transition-all duration-500 ${isCompleted ? 'is-completed' : ''}`;
                 challengeElement.id = `challenge-${challenge.id}`;
                 challengeElement.innerHTML = `
                     <div class="absolute top-4 right-4 flex gap-2">
@@ -445,13 +450,17 @@
                 const header = e.target.closest('.challenge-header');
 
                 if (editBtn) {
+                    e.stopPropagation(); // Prevent card from expanding when clicking edit
                     openEditAuthModal(editBtn.dataset.id);
                     return; 
                 }
                 
                 if (completeBtn) {
+                    e.stopPropagation(); // Prevent card from expanding when clicking complete
                     const challengeId = completeBtn.dataset.id;
                     const card = completeBtn.closest('.challenge-card');
+                    if (!card) return;
+
                     const rankIndicator = card.querySelector('.rank-indicator');
                     
                     const isNowCompleted = card.classList.toggle('is-completed');
@@ -463,7 +472,7 @@
                     } else {
                         localStorage.removeItem(`challenge-completed-${challengeId}`);
                     }
-                    return; // Prevent card from expanding/collapsing
+                    return;
                 }
 
                 if (header) {
